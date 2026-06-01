@@ -12,6 +12,8 @@ import { ManageEvents } from './features/events/manage-events/manage-events';
 import { CreateEvent } from './features/events/manage-events/create-event/create-event';
 import { EditEvent } from './features/events/manage-events/edit-event/edit-event';
 import { Messaging } from './features/messaging/messaging';
+import { Navbar } from './shared/components/navbar/navbar';
+import { LoginForm } from './shared/components/login-form/login-form';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,8 @@ import { Messaging } from './features/messaging/messaging';
     CreateEvent,
     EditEvent,
     Messaging,
+    Navbar,
+    LoginForm,
   ],
   imports: [BrowserModule, AppRoutingModule],
   providers: [provideBrowserGlobalErrorListeners()],

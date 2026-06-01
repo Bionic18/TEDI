@@ -1,0 +1,4 @@
+.active {
+  font-weight: bold;
+}
+/* I should make some of the buttons go to the left and some to the right. I should probably add tags in html for this and do it with flex mode?*/

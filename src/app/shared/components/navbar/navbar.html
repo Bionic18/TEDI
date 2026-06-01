@@ -1,0 +1,11 @@
+<nav>
+  <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a> |
+  <a routerLink="/events" routerLinkActive="active">Browse Events</a> |
+  Welcome, Guest | <!-- parametrize user role/name-->
+  <button (click)="changeShowLoginForm()">Log-in</button> |
+  <a routerLink="/signup" routerLinkActive="active"> Sign-up</a>
+</nav>
+<!-- definitely need this to change based on roles-->
+@if (showLoginForm) {
+  <app-login-form></app-login-form>
+}
