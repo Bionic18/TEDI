@@ -1,1 +1,26 @@
-<p>login-form works!</p>
+<form #loginForm="ngForm" (ngSubmit)="save()">
+  <input [(ngModel)]="username"
+  name="loginFormUsername"
+  #usernameCtrl="ngModel"
+  required
+  type="text"
+  placeholder="Username"
+  >
+
+  @if (usernameCtrl.invalid && usernameCtrl.touched) {
+    <p>Username is required.</p>
+  }
+  <input [(ngModel)]="password"
+  name="loginFormPassword"
+  #passwordCtrl="ngModel"
+  required
+  type="password"
+  placeholder="Password">
+
+  @if (passwordCtrl.invalid &&passwordCtrl.touched) {
+    <p>Password is required.</p>
+  }
+  <button type="submit" [disabled]="loginForm.invalid">
+    Log-in
+  </button>
+</form>
