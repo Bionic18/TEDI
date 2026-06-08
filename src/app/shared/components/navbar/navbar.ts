@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component,inject } from '@angular/core';
+import { AuthService } from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-navbar',
@@ -7,6 +8,7 @@ import { Component } from '@angular/core';
   styleUrl: './navbar.css',
 })
 export class Navbar {
+  authService = inject(AuthService);
   showLoginForm = false;
   changeShowLoginForm () {
     this.showLoginForm = !this.showLoginForm;

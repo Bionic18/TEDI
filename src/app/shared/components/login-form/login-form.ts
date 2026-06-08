@@ -7,8 +7,8 @@ import { Component } from '@angular/core';
   styleUrl: './login-form.css',
 })
 export class LoginForm {
-    username ='';
-    password = ''; // authenticate!!!!
+  username = '';
+  password = ''; // authenticate!!!!
   save(): void {
     console.log(this.username, this.password); //PLACEHOLDER
   }

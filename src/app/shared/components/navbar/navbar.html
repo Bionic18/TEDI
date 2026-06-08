@@ -1,11 +1,21 @@
 <nav>
   <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a> |
   <a routerLink="/events" routerLinkActive="active">Browse Events</a> |
-  Welcome, Guest | <!-- parametrize user role/name-->
+  Welcome,
+  @if (authService.currentUser){ <!-- If the currentUser is not null, then the username variable is valid !-->
+    {{authService.currentUser.username}}
+  } @else { <!-- If the current user IS null, then we it is a guest :)!-->
+    Guest
+  } |
   <button (click)="changeShowLoginForm()">Log-in</button> |
   <a routerLink="/signup" routerLinkActive="active"> Sign-up</a>
+  <button (click)="authService.logInAsAdmin()">Change role to admin</button> |
+  <button (click)="authService.logInAsRegistered()">Change role to user</button>
+  <button (click)="authService.logout()">LogOut</button>
 </nav>
 <!-- definitely need this to change based on roles-->
 @if (showLoginForm) {
   <app-login-form></app-login-form>
 }
+
+ <!--Θέλουμε επίσης να εξαφανίζεται όταν αλλάζει η σελίδα!-->
