@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
+import {EventService} from '../../../core/services/event-service';
 
 @Component({
   selector: 'app-browse-events',
@@ -6,4 +7,7 @@ import { Component } from '@angular/core';
   templateUrl: './browse-events.html',
   styleUrl: './browse-events.css',
 })
-export class BrowseEvents {}
+export class BrowseEvents {
+  eventService = inject(EventService);
+  events = this.eventService.getAllEvents();
+}

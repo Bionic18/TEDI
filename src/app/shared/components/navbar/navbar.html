@@ -1,6 +1,6 @@
 <nav>
   <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a> |
-  @if (!authService.currentUser || authService.currentUser?.role === userRole.Registered) {<!-- If the current user is a guest or a Registered user, we show them the browse events page !-->
+  @if (!authService.currentUser || authService.currentUser.role === userRole.Registered) {<!-- If the current user is a guest or a Registered user, we show them the browse events page !-->
     <a routerLink="/events" routerLinkActive="active">Browse Events</a> |
   }
   @if (authService.currentUser ) { <!-- big if for non guest users !-->
@@ -21,6 +21,7 @@
     <button (click)="changeShowLoginForm()">Log-in</button> |
     <a routerLink="/signup" routerLinkActive="active"> Sign-up</a>
   }
+  <!-- TEMPORARY TEST BUTTONS !-->
   <button (click)="authService.logInAsAdmin()">Change role to admin</button> |
   <button (click)="authService.logInAsRegistered()">Change role to user</button>
   <button (click)="authService.logout()">LogOut</button>

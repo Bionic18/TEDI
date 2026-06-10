@@ -1,1 +1,10 @@
-<p>event-details works!</p>
+<p>event details</p>
+
+<p> Event ID: {{eventID}}</p>
+@if (currentEvent) {
+  <h1>{{ currentEvent.name }}</h1>
+
+  <p>{{ currentEvent.description }}</p>
+
+  <p>{{ currentEvent.date | date:'dd/MM/yyyy HH:mm' }}</p>
+}
