@@ -14,7 +14,7 @@ import { EditEvent } from './features/events/manage-events/edit-event/edit-event
 import { Messaging } from './features/messaging/messaging';
 import { Navbar } from './shared/components/navbar/navbar';
 import { LoginForm } from './shared/components/login-form/login-form';
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [
@@ -31,7 +31,7 @@ import {FormsModule} from "@angular/forms";
     Navbar,
     LoginForm,
   ],
-    imports: [BrowserModule, AppRoutingModule, FormsModule],
+    imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],
 })
