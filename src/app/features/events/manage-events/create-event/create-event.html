@@ -3,57 +3,61 @@
 
   <label>Event Name</label>
   <input type="text" formControlName="name">
-  @if (
-    newEventForm.get('name')?.invalid &&
-    newEventForm.get('name')?.touched
-    ) {
+  @if (hasError("name","required")) {
     <p>Event name is required.</p>
+  }
+  @if (hasError("name","isOnlyWhitespace")) {
+    <p>Event name cannot contain only whitespace.</p>
   }
 
   <label>Description</label>
   <textarea formControlName="description"></textarea>
-  @if (
-    newEventForm.get('description')?.invalid &&
-    newEventForm.get('description')?.touched
-    ) {
+  @if (hasError("description","required")) {
     <p>Description is required.</p>
+  }
+  @if (hasError("description","isOnlyWhitespace")) {
+    <p>Description cannot contain only whitespace.</p>
   }
 
   <label>Venue</label>
   <input type="text" formControlName="venue">
-  @if (
-    newEventForm.get('venue')?.invalid &&
-    newEventForm.get('venue')?.touched
-    ) {
+  @if (hasError("venue","required")) {
     <p>Venue name is required.</p>
   }
+  @if (hasError("venue","isOnlyWhitespace")) {
+    <p>Venue name cannot contain only whitespace.</p>
+  }
+
 
   <label>Address</label>
   <input type="text" formControlName="address">
-  @if (
-    newEventForm.get('address')?.invalid &&
-    newEventForm.get('address')?.touched
-    ) {
+  @if (hasError("address","required")) {
     <p>Address is required.</p>
   }
+  @if (hasError("address","isOnlyWhitespace")) {
+    <p>Address cannot contain only whitespace.</p>
+  }
+
 
   <label>City</label>
   <input type="text" formControlName="city">
-  @if (
-    newEventForm.get('city')?.invalid &&
-    newEventForm.get('city')?.touched
-    ) {
+  @if (hasError("city","required")) {
     <p>City name is required.</p>
   }
+  @if (hasError("city","isOnlyWhitespace")) {
+    <p>City name cannot contain only whitespace.</p>
+  }
+
 
   <label>Country</label>
   <input type="text" formControlName="country">
-  @if (
-    newEventForm.get('country')?.invalid &&
-    newEventForm.get('country')?.touched
-    ) {
+  @if (hasError("country","required")) {
     <p>Country name is required.</p>
   }
+  @if (hasError("country","isOnlyWhitespace")) {
+    <p>Country name cannot contain only whitespace.</p>
+  }
+
 
   <label>Start Date & Time</label>
   <input type="datetime-local"
@@ -74,6 +78,13 @@
     newEventForm.get('endDateTime')?.touched
     ) {
     <p>End date & time is required.</p>
+  }
+  @if (
+    newEventForm.errors?.['invalidDateRange']
+    ) {
+    <p>
+      End date must be after start date.
+    </p>
   }
 
   <label>Capacity</label>
