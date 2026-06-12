@@ -1,5 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {EventService} from '../../../core/services/event-service';
+import {EventStatus} from '../../../core/models/events';
 
 @Component({
   selector: 'app-browse-events',
@@ -9,5 +10,5 @@ import {EventService} from '../../../core/services/event-service';
 })
 export class BrowseEvents {
   eventService = inject(EventService);
-  events = this.eventService.getAllEvents();
+  events = this.eventService.getAllEvents(EventStatus.Published);
 }

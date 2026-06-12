@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Event} from '../models/events';
+import {Event, EventStatus} from '../models/events';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,8 @@ export class EventService {
       country: "Greece",
       startDateTime: new Date("2026-06-19T20:00:00"),
       endDateTime: new Date("2026-06-20T00:00:00"),
-      capacity:5000
+      capacity:5000,
+      status: EventStatus.Published
     },
     {
       id: 2,
@@ -30,7 +31,8 @@ export class EventService {
       country: "Greece",
       startDateTime: new Date("2026-06-13T22:00:00"),
       endDateTime: new Date("2026-06-13T23:00:00"),
-      capacity: 10000
+      capacity: 10000,
+      status: EventStatus.Published
     },
     {
       id: 3,
@@ -43,12 +45,22 @@ export class EventService {
       country: "United Kingdom",
       startDateTime: new Date("2026-06-20T20:00:00"),
       endDateTime: new Date("2026-06-20T23:30:00"),
-      capacity: 30000
+      capacity: 30000,
+      status: EventStatus.Cancelled
     }
   ];
- getAllEvents(): Event[]{
-   return this.events;
- }
+ getAllEvents(
+    status?: EventStatus
+  ): Event[] {
+
+    if (!status) {
+      return this.events;
+    }
+
+    return this.events.filter(
+      event => event.status === status
+    );
+  }
   getEventByID(temp_id :number) :Event | undefined {
     return this.events.find(temp_event => temp_event.id === temp_id);
   }

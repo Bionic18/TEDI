@@ -1,7 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
 import {EventService} from '../../../../core/services/event-service';
-import {Event} from '../../../../core/models/events';
+import {Event, EventStatus} from '../../../../core/models/events';
 import {AuthService} from '../../../../core/services/auth-service';
 
 
@@ -72,11 +72,12 @@ export class CreateEvent { //ID is not added here, because it's automatically ge
       startDateTime: new Date(formValue.startDateTime!),
       endDateTime: new Date(formValue.endDateTime!),
 
-      capacity: Number(formValue.capacity)
+      capacity: Number(formValue.capacity),
+      status: EventStatus.Published
     };
 
     this.eventService.addEvent(newEvent); //temporary solution, ideally we'd POST
-
+//Also need to add a function for the draft state. Maybe a seperate button or a preview page where it's automatically saved as a draft and change as published when the publish button is pressed
     console.log(newEvent);
     this.newEventForm.reset();}
   hasError(controlName: string, errorName: string): boolean {

@@ -9,6 +9,7 @@ import {AuthService} from '../../../core/services/auth-service';
   templateUrl: './manage-events.html',
   styleUrl: './manage-events.css',
 })
+//WOuld like to add a view for draft events in the future
 export class ManageEvents {
   eventService = inject(EventService);
   authService = inject(AuthService);
