@@ -10,6 +10,7 @@ export class EventService {
       id: 1,
       name: "Jaul",
       description: "Jaul Concert in Athens!",
+      organizerUsername: "Test Doe",
       venue: "Technopolis",
       address: "Pireos 100",
       city: "Athens",
@@ -22,6 +23,7 @@ export class EventService {
       id: 2,
       name: "Sponty",
       description: "Sponty Concert in Athens!",
+      organizerUsername: "Test Doe",
       venue: "Plato Academy Park",
       address: "Monastiriou & Tilefanous",
       city: "Athens",
@@ -34,6 +36,7 @@ export class EventService {
       id: 3,
       name: "Pepsi MAX presents Parklife 2026 - Saturday",
       description: "Skepta Concert in Manchester!",
+      organizerUsername: "Skepta Manager",
       venue:"Heaton Park",
       address: "Middleton Road",
       city: "Manchester",
@@ -48,5 +51,25 @@ export class EventService {
  }
   getEventByID(temp_id :number) :Event | undefined {
     return this.events.find(temp_event => temp_event.id === temp_id);
+  }
+  addEvent(newEvent: Event): void { //temporary solutions
+    this.events.push(newEvent);
+  }
+  getNextID(): number { //temporary solution #2
+    if (this.events.length === 0) {
+      return 1;
+    }
+    return Math.max(
+      ...this.events.map(event => event.id)
+    ) + 1;
+  }
+  getEventsByOrganizer( //use this for the manage events page
+    organizerUsername: string
+  ): Event[] {
+
+    return this.events.filter(
+      event =>
+        event.organizerUsername === organizerUsername
+    );
   }
 }

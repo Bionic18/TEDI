@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
+import {EventService} from '../../../../core/services/event-service';
+import {Event} from '../../../../core/models/events';
+import {AuthService} from '../../../../core/services/auth-service';
 
 
 export function dateRangeValidator(control :AbstractControl): ValidationErrors | null {
@@ -46,9 +49,36 @@ export class CreateEvent { //ID is not added here, because it's automatically ge
     validators: dateRangeValidator
 }); //more validators to be added
 
+  eventService = inject(EventService);
+  authService = inject(AuthService);
   onSubmit() {
-    console.log(this.newEventForm.value); //temporary, need to connect to backend
-  }
+
+    const formValue = this.newEventForm.value;
+
+    const newEvent: Event = {
+      id: this.eventService.getNextID(), //temporary solution
+
+      name: formValue.name!,
+      description: formValue.description!,
+
+      organizerUsername:
+      this.authService.currentUser!.username,
+
+      venue: formValue.venue!,
+      address: formValue.address!,
+      city: formValue.city!,
+      country: formValue.country!,
+
+      startDateTime: new Date(formValue.startDateTime!),
+      endDateTime: new Date(formValue.endDateTime!),
+
+      capacity: Number(formValue.capacity)
+    };
+
+    this.eventService.addEvent(newEvent); //temporary solution, ideally we'd POST
+
+    console.log(newEvent);
+    this.newEventForm.reset();}
   hasError(controlName: string, errorName: string): boolean {
     const control = this.newEventForm.get(controlName);
 

@@ -3,6 +3,8 @@ export interface Event {
   name: string;
   description: string;
 
+  organizerUsername: string;
+
   venue: string;
   address: string;
   city: string;
