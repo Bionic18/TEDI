@@ -1,12 +1,1 @@
-<h1>My Events</h1>
-
-@for (event of events; track event.id) {
-
-  <li>
-    <h3>{{ event.name }}</h3>
-    <p> {{ event.startDateTime | date:'dd/MM/yyyy HH:mm' }} </p>
-    <p>Status: {{ event.status }}</p>
-    <a [routerLink]="['/events', event.id]"> View Details  </a>
-    <a [routerLink]="['/manage-events/edit', event.id]">Edit</a>
-  </li>
-}
+<p>manage-events works!</p>

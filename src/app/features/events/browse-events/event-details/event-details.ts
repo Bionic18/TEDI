@@ -1,7 +1,7 @@
-import {Component, inject} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {EventService} from '../../../../core/services/event-service';
-import {Event} from '../../../../core/models/events';
+import { Component, inject, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { EventService } from '../../../../core/services/event-service';
+import { Event } from '../../../../core/models/events';
 
 @Component({
   selector: 'app-event-details',
@@ -9,15 +9,17 @@ import {Event} from '../../../../core/models/events';
   templateUrl: './event-details.html',
   styleUrl: './event-details.css',
 })
-export class EventDetails {
+export class EventDetails implements OnInit {
   eventID: number | null = null;
   currentEvent: Event | undefined;
-  eventService = inject(EventService);
+  private eventService = inject(EventService);
+
   constructor(private route: ActivatedRoute) {}
+
   ngOnInit() {
-    this.eventID = Number(
-      this.route.snapshot.paramMap.get('id')
-    );
-    this.currentEvent = this.eventService.getEventByID(this.eventID);
+    this.eventID = Number(this.route.snapshot.paramMap.get('id'));
+    this.eventService
+      .getEventByID(this.eventID)
+      .subscribe((event) => (this.currentEvent = event));
   }
 }

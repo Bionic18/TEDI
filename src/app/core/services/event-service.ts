@@ -1,87 +1,62 @@
-import { Injectable } from '@angular/core';
-import {Event, EventStatus} from '../models/events';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Event } from '../models/events';
+
+// Payload sent when creating/updating an event. The backend fills in id,
+// status and organizerId (the latter from the JWT), so they are not sent here.
+export interface EventPayload {
+  name: string;
+  description: string;
+  venue: string;
+  address: string;
+  city: string;
+  country: string;
+  startDateTime: string;
+  endDateTime: string;
+  capacity: number;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventService {
- private events : Event[] = [ //THIS IS TEMPORARY MOCK DATA
-    {
-      id: 1,
-      name: "Jaul",
-      description: "Jaul Concert in Athens!",
-      organizerUsername: "Test Doe",
-      venue: "Technopolis",
-      address: "Pireos 100",
-      city: "Athens",
-      country: "Greece",
-      startDateTime: new Date("2026-06-19T20:00:00"),
-      endDateTime: new Date("2026-06-20T00:00:00"),
-      capacity:5000,
-      status: EventStatus.Published
-    },
-    {
-      id: 2,
-      name: "Sponty",
-      description: "Sponty Concert in Athens!",
-      organizerUsername: "Test Doe",
-      venue: "Plato Academy Park",
-      address: "Monastiriou & Tilefanous",
-      city: "Athens",
-      country: "Greece",
-      startDateTime: new Date("2026-06-13T22:00:00"),
-      endDateTime: new Date("2026-06-13T23:00:00"),
-      capacity: 10000,
-      status: EventStatus.Published
-    },
-    {
-      id: 3,
-      name: "Pepsi MAX presents Parklife 2026 - Saturday",
-      description: "Skepta Concert in Manchester!",
-      organizerUsername: "Skepta Manager",
-      venue:"Heaton Park",
-      address: "Middleton Road",
-      city: "Manchester",
-      country: "United Kingdom",
-      startDateTime: new Date("2026-06-20T20:00:00"),
-      endDateTime: new Date("2026-06-20T23:30:00"),
-      capacity: 30000,
-      status: EventStatus.Cancelled
-    }
-  ];
- getAllEvents(
-    status?: EventStatus
-  ): Event[] {
+  private http = inject(HttpClient);
+  private readonly baseUrl = 'http://localhost:3000/events';
 
-    if (!status) {
-      return this.events;
+  // GET /events  (public). Optional filters map to query params, e.g.
+  // { status: 'PUBLISHED' } or { organizerId: 3 } for the manage page.
+  getAllEvents(filter?: {
+    status?: string;
+    organizerId?: number;
+  }): Observable<Event[]> {
+    let params: Record<string, string> = {};
+    if (filter?.status) {
+      params['status'] = filter.status;
     }
-
-    return this.events.filter(
-      event => event.status === status
-    );
-  }
-  getEventByID(temp_id :number) :Event | undefined {
-    return this.events.find(temp_event => temp_event.id === temp_id);
-  }
-  addEvent(newEvent: Event): void { //temporary solutions
-    this.events.push(newEvent);
-  }
-  getNextID(): number { //temporary solution #2
-    if (this.events.length === 0) {
-      return 1;
+    if (filter?.organizerId != null) {
+      params['organizerId'] = String(filter.organizerId);
     }
-    return Math.max(
-      ...this.events.map(event => event.id)
-    ) + 1;
+    return this.http.get<Event[]>(this.baseUrl, { params });
   }
-  getEventsByOrganizer( //use this for the manage events page
-    organizerUsername: string
-  ): Event[] {
 
-    return this.events.filter(
-      event =>
-        event.organizerUsername === organizerUsername
-    );
+  // GET /events/{id}  (public)
+  getEventByID(id: number): Observable<Event> {
+    return this.http.get<Event>(`${this.baseUrl}/${id}`);
+  }
+
+  // POST /events  (requires a logged-in user; the JWT identifies the organizer)
+  createEvent(payload: EventPayload): Observable<Event> {
+    return this.http.post<Event>(this.baseUrl, payload);
+  }
+
+  // PUT /events/{id}  (organizer only)
+  updateEvent(id: number, payload: Partial<EventPayload>): Observable<Event> {
+    return this.http.put<Event>(`${this.baseUrl}/${id}`, payload);
+  }
+
+  // DELETE /events/{id}  (organizer only, DRAFT events only)
+  deleteEvent(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

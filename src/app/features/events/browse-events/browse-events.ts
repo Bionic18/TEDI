@@ -1,6 +1,6 @@
-import {Component, inject} from '@angular/core';
-import {EventService} from '../../../core/services/event-service';
-import {EventStatus} from '../../../core/models/events';
+import { Component, inject, OnInit } from '@angular/core';
+import { EventService } from '../../../core/services/event-service';
+import { Event } from '../../../core/models/events';
 
 @Component({
   selector: 'app-browse-events',
@@ -8,7 +8,14 @@ import {EventStatus} from '../../../core/models/events';
   templateUrl: './browse-events.html',
   styleUrl: './browse-events.css',
 })
-export class BrowseEvents {
-  eventService = inject(EventService);
-  events = this.eventService.getAllEvents(EventStatus.Published);
+export class BrowseEvents implements OnInit {
+  private eventService = inject(EventService);
+  events: Event[] = [];
+
+  ngOnInit() {
+    // Public browse view: only published events are shown.
+    this.eventService
+      .getAllEvents({ status: 'PUBLISHED' })
+      .subscribe((events) => (this.events = events));
+  }
 }

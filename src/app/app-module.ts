@@ -15,6 +15,7 @@ import { Messaging } from './features/messaging/messaging';
 import { Navbar } from './shared/components/navbar/navbar';
 import { LoginForm } from './shared/components/login-form/login-form';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
     LoginForm,
   ],
     imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule],
-  providers: [provideBrowserGlobalErrorListeners()],
+  providers: [provideBrowserGlobalErrorListeners(), provideHttpClient(withFetch())],
   bootstrap: [App],
 })
 export class AppModule {}
