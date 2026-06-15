@@ -1,1 +1,113 @@
-<p>edit-event works!</p>
+<form [formGroup]="editEventForm"
+(ngSubmit)="onSubmit()">
+
+  <label>Event Name</label>
+  <input type="text" formControlName="name">
+  @if (hasError("name","required")) {
+    <p>Event name is required.</p>
+  }
+  @if (hasError("name","isOnlyWhitespace")) {
+    <p>Event name cannot contain only whitespace.</p>
+  }
+
+  <label>Description</label>
+  <textarea formControlName="description"></textarea>
+  @if (hasError("description","required")) {
+    <p>Description is required.</p>
+  }
+  @if (hasError("description","isOnlyWhitespace")) {
+    <p>Description cannot contain only whitespace.</p>
+  }
+
+  <label>Venue</label>
+  <input type="text" formControlName="venue">
+  @if (hasError("venue","required")) {
+    <p>Venue name is required.</p>
+  }
+  @if (hasError("venue","isOnlyWhitespace")) {
+    <p>Venue name cannot contain only whitespace.</p>
+  }
+
+
+  <label>Address</label>
+  <input type="text" formControlName="address">
+  @if (hasError("address","required")) {
+    <p>Address is required.</p>
+  }
+  @if (hasError("address","isOnlyWhitespace")) {
+    <p>Address cannot contain only whitespace.</p>
+  }
+
+
+  <label>City</label>
+  <input type="text" formControlName="city">
+  @if (hasError("city","required")) {
+    <p>City name is required.</p>
+  }
+  @if (hasError("city","isOnlyWhitespace")) {
+    <p>City name cannot contain only whitespace.</p>
+  }
+
+
+  <label>Country</label>
+  <input type="text" formControlName="country">
+  @if (hasError("country","required")) {
+    <p>Country name is required.</p>
+  }
+  @if (hasError("country","isOnlyWhitespace")) {
+    <p>Country name cannot contain only whitespace.</p>
+  }
+
+
+  <label>Start Date & Time</label>
+  <input type="datetime-local"
+         formControlName="startDateTime">
+  @if (
+    editEventForm.get('startDateTime')?.invalid &&
+    editEventForm.get('startDateTime')?.touched
+    ) {
+    <p>Start date & time is required.</p>
+  }
+
+
+  <label>End Date & Time</label>
+  <input type="datetime-local"
+         formControlName="endDateTime">
+  @if (
+    editEventForm.get('endDateTime')?.invalid &&
+    editEventForm.get('endDateTime')?.touched
+    ) {
+    <p>End date & time is required.</p>
+  }
+  @if (
+    editEventForm.errors?.['invalidDateRange']
+    ) {
+    <p>
+      End date must be after start date.
+    </p>
+  }
+
+  <label>Capacity</label>
+  <input type="number"
+         formControlName="capacity">
+  @if (
+    editEventForm.get('capacity')?.errors?.['min'] &&
+    editEventForm.get('capacity')?.touched
+    ) {
+    <p>Capacity must be greater than 0.</p>
+  }
+  @if (
+    editEventForm.get('capacity')?.errors?.['required'] &&
+    editEventForm.get('capacity')?.touched
+    ) {
+    <p>Capacity is required.</p>
+  }
+
+  <button
+    type="submit"
+    [disabled]="editEventForm.invalid">
+
+    Save Changes
+
+  </button>
+</form>

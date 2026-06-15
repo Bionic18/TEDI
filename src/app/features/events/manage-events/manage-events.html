@@ -5,6 +5,8 @@
   <li>
     <h3>{{ event.name }}</h3>
     <p> {{ event.startDateTime | date:'dd/MM/yyyy HH:mm' }} </p>
-    <a [routerLink]="['/events', event.id]"> View Details</a>
+    <p>Status: {{ event.status }}</p>
+    <a [routerLink]="['/events', event.id]"> View Details  </a>
+    <a [routerLink]="['/manage-events/edit', event.id]">Edit</a>
   </li>
 }
