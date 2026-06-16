@@ -103,8 +103,8 @@
     <p>Capacity is required.</p>
   }
 
-  <button type="submit" [disabled]="newEventForm.invalid">
-    Create Event
-  </button>
+  <button type="submit" [disabled]="newEventForm.invalid">Create Event</button>
+  <button type="button" (click)="saveDraft()">Save Draft</button>
+<!--  add a button to say "Draft added"-->
 
 </form>

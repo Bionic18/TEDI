@@ -19,8 +19,8 @@ export interface Event {
   city: string;
   country: string;
 
-  startDateTime: Date;
-  endDateTime: Date;
+  startDateTime: Date | null;
+  endDateTime: Date | null;
 
   capacity: number;
 

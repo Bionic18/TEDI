@@ -3,6 +3,7 @@
     <h1>{{temp_event.name}}</h1>
     <p>{{temp_event.description }}</p>
     <p>{{temp_event.startDateTime | date:'dd/MM/yyyy HH:MM'}} - {{temp_event.endDateTime | date:'dd/MM/yyyy HH:MM'}}</p>
+    <p>Status: {{ temp_event.status }}</p>
     <a [routerLink] ="['/events',temp_event.id]" routerLinkActive="active"><button>View Details</button></a>
   </li>
 }

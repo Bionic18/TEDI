@@ -10,5 +10,5 @@ import {EventStatus} from '../../../core/models/events';
 })
 export class BrowseEvents {
   eventService = inject(EventService);
-  events = this.eventService.getAllEvents(EventStatus.Published);
+  events = [...this.eventService.getAllEvents(EventStatus.Published), ...this.eventService.getAllEvents(EventStatus.Cancelled)];
 }

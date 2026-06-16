@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
+import {EventStatus, Event} from '../models/events';
+
 
 export function dateRangeValidator(control :AbstractControl): ValidationErrors | null {
   const start = control.get('startDateTime')?.value;
@@ -47,5 +49,32 @@ export class EventFormService {
   formatDateTime(date: Date): string { //helper function to convert Date object into the HTML dateTimeLocal format. Adapted from:https://stackoverflow.com/questions/28760254/assign-javascript-date-to-html5-datetime-local-input
 
     return (new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString()).slice(0, -1);
+  }
+
+  fillEventFromForm(input_form :FormGroup,input_status: EventStatus, input_id :number,input_organizer :string ): Event {
+    const formValue = input_form.value;
+    return {
+      id: input_id,
+      name: formValue.name!,
+      description: formValue.description!,
+
+      organizerUsername: input_organizer,
+
+      venue: formValue.venue!,
+      address: formValue.address!,
+      city: formValue.city!,
+      country: formValue.country!,
+
+      startDateTime: formValue.startDateTime
+        ? new Date(formValue.startDateTime)
+        : null,
+
+      endDateTime: formValue.endDateTime
+        ? new Date(formValue.endDateTime)
+        : null,
+
+      capacity: Number(formValue.capacity),
+      status: input_status
+    }
   }
 }

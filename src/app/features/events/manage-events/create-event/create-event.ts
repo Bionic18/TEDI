@@ -19,34 +19,17 @@ export class CreateEvent { //ID is not added here, because it's automatically ge
   eventService = inject(EventService);
   authService = inject(AuthService);
   onSubmit() {
-
-    const formValue = this.newEventForm.value;
-
-    const newEvent: Event = {
-      id: this.eventService.getNextID(), //temporary solution
-
-      name: formValue.name!,
-      description: formValue.description!,
-
-      organizerUsername:
-      this.authService.currentUser!.username,
-
-      venue: formValue.venue!,
-      address: formValue.address!,
-      city: formValue.city!,
-      country: formValue.country!,
-
-      startDateTime: new Date(formValue.startDateTime!),
-      endDateTime: new Date(formValue.endDateTime!),
-
-      capacity: Number(formValue.capacity),
-      status: EventStatus.Published
-    };
-
+    const newEvent :Event = this.eventFormService.fillEventFromForm(this.newEventForm,EventStatus.Published,this.eventService.getNextID(),this.authService.currentUser!.username)
     this.eventService.addEvent(newEvent); //temporary solution, ideally we'd POST
 //Also need to add a function for the draft state. Maybe a seperate button or a preview page where it's automatically saved as a draft and change as published when the publish button is pressed
     console.log(newEvent);
     this.newEventForm.reset();}
+  saveDraft(){
+    const newEvent :Event = this.eventFormService.fillEventFromForm(this.newEventForm,EventStatus.Draft,this.eventService.getNextID(),this.authService.currentUser!.username);
+    this.eventService.addEvent(newEvent);
+    console.log(newEvent);
+  }
+
   hasError(controlName: string, errorName: string): boolean {
     const control = this.newEventForm.get(controlName);
 
