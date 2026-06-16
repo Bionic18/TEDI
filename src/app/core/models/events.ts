@@ -1,29 +1,25 @@
-export enum EventStatus {
-  Draft = 'DRAFT',
-  Published = 'PUBLISHED',
-  Completed = 'COMPLETED',
-  Cancelled = 'CANCELLED'
-}
+import {EventStatus} from './eventStatus';
 
 export interface Event {
   id: number;
+
   name: string;
   description: string;
-
-  organizerUsername: string;
-
-
 
   venue: string;
   address: string;
   city: string;
   country: string;
 
-  startDateTime: Date | null;
-  endDateTime: Date | null;
+  startDateTime: Date | string;
+  endDateTime: Date | string;
 
   capacity: number;
 
   status: EventStatus;
 
-} //TEMPORARY UNTIL ACTUAL DATA COMES. WAY MORE FIELDS NEED TO BE ADDED.
+  organizerId: number;
+
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}

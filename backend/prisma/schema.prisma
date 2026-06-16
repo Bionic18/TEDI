@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+
+  moduleFormat = "esm"
+  generatedFileExtension = "mts"
+  importFileExtension = "mjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  roles        String[]
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // An organizer is just a registered user who has created events.
+  organizedEvents Event[] @relation("OrganizedEvents")
+}
+
+// EventStatus mirrors the Status values described in the assignment DTD.
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+model Event {
+  id            Int         @id @default(autoincrement())
+  name          String
+  description   String
+  venue         String
+  address       String
+  city          String
+  country       String
+  startDateTime DateTime
+  endDateTime   DateTime
+  capacity      Int
+  status        EventStatus @default(DRAFT)
+
+  // The registered user who created the event (acts as the Organizer).
+  organizer   User @relation("OrganizedEvents", fields: [organizerId], references: [id])
+  organizerId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizerId])
+}
