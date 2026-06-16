@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {AbstractControl, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
-import {EventStatus, Event} from '../models/events';
+import {Event} from '../models/events';
+import {EventStatus} from '../models/eventStatus';
 
 
 export function dateRangeValidator(control :AbstractControl): ValidationErrors | null {
@@ -51,14 +52,14 @@ export class EventFormService {
     return (new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString()).slice(0, -1);
   }
 
-  fillEventFromForm(input_form :FormGroup,input_status: EventStatus, input_id :number,input_organizer :string ): Event {
+  fillEventFromForm(input_form :FormGroup,input_status: EventStatus, input_id :number,input_organizerID :number ): Event {
     const formValue = input_form.value;
     return {
       id: input_id,
       name: formValue.name!,
       description: formValue.description!,
 
-      organizerUsername: input_organizer,
+      organizerId: input_organizerID,
 
       venue: formValue.venue!,
       address: formValue.address!,
@@ -67,11 +68,11 @@ export class EventFormService {
 
       startDateTime: formValue.startDateTime
         ? new Date(formValue.startDateTime)
-        : null,
+        : "",
 
       endDateTime: formValue.endDateTime
         ? new Date(formValue.endDateTime)
-        : null,
+        : "",
 
       capacity: Number(formValue.capacity),
       status: input_status

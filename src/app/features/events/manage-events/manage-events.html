@@ -8,7 +8,7 @@
     <p>Status: {{ event.status }}</p>
     <a [routerLink]="['/events', event.id]"> View Details  </a>
     <a [routerLink]="['/manage-events/edit', event.id]">Edit</a>
-    <button (click)="eventService.cancelEvent(event.id)" >Cancel </button>
+<!--    <button (click)="eventService.cancelEvent(event.id)" >Cancel </button>-->
   </li>
 }
 
@@ -18,11 +18,12 @@
   <li>
     <h3>{{draftEvent.name}}</h3>
     <p>Status: {{draftEvent.status}}</p>
-    <button (click)="publishEvent(draftEvent.id)"
-    [disabled]="!eventService.canPublish(draftEvent)"
-            [title]="!eventService.canPublish(draftEvent)
-      ? 'This event cannot be published because required information is missing.'
-      : 'Publish event'"> Publish </button>
+    <button (click)="publishEvent(draftEvent.id)">
+    <!--    [disabled]="!eventService.canPublish(draftEvent)"-->
+<!--            [title]="!eventService.canPublish(draftEvent)-->
+<!--      ? 'This event cannot be published because required information is missing.'-->
+<!--      : 'Publish event'"-->
+      Publish </button>
 <!--    @if (!eventService.canPublish(draftEvent)) {-->
 <!--      <p>-->
 <!--        This event cannot be published because required-->

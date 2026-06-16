@@ -1,8 +1,8 @@
-import {Component, inject} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {EventService} from '../../../../core/services/event-service';
-import {Event} from '../../../../core/models/events';
-import {EventFormService} from '../../../../core/services/event-form-service';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { EventService, EventPayload } from '../../../../core/services/event-service';
+import { Event } from '../../../../core/models/events';
+import { EventFormService } from '../../../../core/services/event-form-service';
 
 @Component({
   selector: 'app-edit-event',
@@ -10,43 +10,52 @@ import {EventFormService} from '../../../../core/services/event-form-service';
   templateUrl: './edit-event.html',
   styleUrl: './edit-event.css',
 })
-
-//ADD AN EVENT-NOT-FOUND PAGE AND A ROUTE GUARD FOR NON-USERS/EVENT FOR USERS THAT HAVEN'T CREATED IT
 export class EditEvent {
   eventID: number | null = null;
-  currentEvent : Event | undefined = undefined;
-  constructor( private route: ActivatedRoute) {}
+  currentEvent: Event | undefined = undefined;
+
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   eventService = inject(EventService);
   eventFormService = inject(EventFormService);
+
   editEventForm = this.eventFormService.createForm();
-  router = inject(Router);
+
   ngOnInit() {
-    this.eventID = Number(this.route.snapshot.paramMap.get("id"));
-    this.currentEvent = this.eventService.getEventByID(this.eventID);
-    if (this.currentEvent) {
+    this.eventID = Number(this.route.snapshot.paramMap.get('id'));
 
-      this.editEventForm.patchValue({
+    this.eventService.getEventByID(this.eventID).subscribe({
+      next: (event) => {
+        this.currentEvent = event;
 
-        name: this.currentEvent.name,
-        description: this.currentEvent.description,
+        this.editEventForm.patchValue({
+          name: event.name,
+          description: event.description,
 
-        venue: this.currentEvent.venue,
-        address: this.currentEvent.address,
-        city: this.currentEvent.city,
-        country: this.currentEvent.country,
-        startDateTime: this.currentEvent.startDateTime
-          ? this.eventFormService.formatDateTime(this.currentEvent.startDateTime)
-          : '',
-        endDateTime: this.currentEvent.endDateTime
-          ? this.eventFormService.formatDateTime(this.currentEvent.endDateTime)
-          : '',
+          venue: event.venue,
+          address: event.address,
+          city: event.city,
+          country: event.country,
 
-        capacity: this.currentEvent.capacity
+          startDateTime: this.eventFormService.formatDateTime(
+            new Date(event.startDateTime)
+          ),
 
-      });
-    }
+          endDateTime: this.eventFormService.formatDateTime(
+            new Date(event.endDateTime)
+          ),
+
+          capacity: event.capacity,
+        });
+      },
+
+      error: (err) => {
+        console.error('Failed to load event', err);
+      },
+    });
   }
-  hasError(controlName: string, errorName: string): boolean { //THIS IS VERY SLOPPY
+
+  hasError(controlName: string, errorName: string): boolean {
     const control = this.editEventForm.get(controlName);
 
     return !!(
@@ -54,37 +63,33 @@ export class EditEvent {
       control.touched
     );
   }
-  onSubmit() {
 
-    if (!this.currentEvent) {
+  onSubmit() {
+    if (!this.eventID || this.editEventForm.invalid) {
       return;
     }
 
-    const formValue =
-      this.editEventForm.value;
+    const raw = this.editEventForm.value;
 
-    const updatedEvent: Event = {
-
-      ...this.currentEvent,
-
-      name: formValue.name!,
-      description: formValue.description!,
-
-      venue: formValue.venue!,
-      address: formValue.address!,
-      city: formValue.city!,
-      country: formValue.country!,
-
-      startDateTime: new Date(formValue.startDateTime!),
-
-      endDateTime: new Date(formValue.endDateTime!),
-
-      capacity: Number(formValue.capacity)
-
+    const payload: Partial<EventPayload> = {
+      name: raw.name!,
+      description: raw.description!,
+      venue: raw.venue!,
+      address: raw.address!,
+      city: raw.city!,
+      country: raw.country!,
+      startDateTime: raw.startDateTime!,
+      endDateTime: raw.endDateTime!,
+      capacity: Number(raw.capacity),
     };
 
-    this.eventService.updateEvent(updatedEvent);
-    this.router.navigate(['/manage-events']);
+    this.eventService.updateEvent(this.eventID, payload).subscribe({
+      next: () => {
+        void this.router.navigate(['/manage-events']);
+      },
+      error: (err) => {
+        console.error('Failed to update event', err);
+      },
+    });
   }
-
 }
