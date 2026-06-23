@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { EventService } from '../../../../core/services/event-service';
 import { Event } from '../../../../core/models/events';
@@ -9,17 +9,21 @@ import { Event } from '../../../../core/models/events';
   templateUrl: './event-details.html',
   styleUrl: './event-details.css',
 })
-export class EventDetails implements OnInit {
-  eventID: number | null = null;
-  currentEvent: Event | undefined;
+export class EventDetails {
+  private route = inject(ActivatedRoute);
   private eventService = inject(EventService);
 
-  constructor(private route: ActivatedRoute) {}
+  currentEvent = signal<Event | null>(null);
 
   ngOnInit() {
-    this.eventID = Number(this.route.snapshot.paramMap.get('id'));
-    this.eventService
-      .getEventByID(this.eventID)
-      .subscribe((event) => (this.currentEvent = event));
+    const eventID = Number(this.route.snapshot.paramMap.get('id'));
+    this.eventService.getEventByID(eventID).subscribe({
+      next: (event) => {
+        this.currentEvent.set(event);
+      },
+      error: (err) => {
+        console.error('Failed to load event details', err);
+      },
+    });
   }
 }
