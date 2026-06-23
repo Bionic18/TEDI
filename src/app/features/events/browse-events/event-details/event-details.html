@@ -1,21 +1,21 @@
 <!--<p>event details</p>-->
 
 <!--<p> Event ID: {{eventID}}</p>-->
-@if (currentEvent) {
-  <h1>{{ currentEvent.name }}</h1>
+@if (currentEvent(); as event) {
+  <h1>{{ event.name }}</h1>
 
   <div>
     <h3>Description</h3>
-    <p>{{ currentEvent.description }}</p>
+    <p>{{ event.description }}</p>
   </div>
 
   <div>
     <h3>Location</h3>
 
-    <p><strong>Venue:</strong> {{ currentEvent.venue }}</p>
-    <p><strong>Address:</strong> {{ currentEvent.address }}</p>
-    <p><strong>City:</strong> {{ currentEvent.city }}</p>
-    <p><strong>Country:</strong> {{ currentEvent.country }}</p>
+    <p><strong>Venue:</strong> {{ event.venue }}</p>
+    <p><strong>Address:</strong> {{ event.address }}</p>
+    <p><strong>City:</strong> {{ event.city }}</p>
+    <p><strong>Country:</strong> {{ event.country }}</p>
   </div>
 
   <div>
@@ -23,17 +23,17 @@
 
     <p>
       <strong>Start:</strong>
-      {{ currentEvent.startDateTime | date:'dd/MM/yyyy HH:mm' }}
+      {{ event.startDateTime | date:'dd/MM/yyyy HH:mm' }}
     </p>
 
     <p>
       <strong>End:</strong>
-      {{ currentEvent.endDateTime | date:'dd/MM/yyyy HH:mm' }}
+      {{ event.endDateTime | date:'dd/MM/yyyy HH:mm' }}
     </p>
   </div>
 
   <div>
     <h3>Capacity</h3>
-    <p>{{ currentEvent.capacity }} attendees</p>
+    <p>{{ event.capacity }} attendees</p>
   </div>
 }
