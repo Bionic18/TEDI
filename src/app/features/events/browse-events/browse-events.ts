@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { EventService } from '../../../core/services/event-service';
 import { Event } from '../../../core/models/events';
 import { EventStatus } from '../../../core/models/eventStatus';
@@ -12,14 +12,14 @@ import { EventStatus } from '../../../core/models/eventStatus';
 export class BrowseEvents {
   eventService = inject(EventService);
 
-  events: Event[] = [];
+  events = signal<Event[]>([]);
 
   ngOnInit() {
     this.eventService
-      .getAllEvents({ status: EventStatus.Published })
+      .getAllEvents({ status: EventStatus.Published || EventStatus.Cancelled })
       .subscribe({
         next: (events) => {
-          this.events = events;
+          this.events.set(events);
         },
         error: (err) => {
           console.error('Failed to load events', err);
