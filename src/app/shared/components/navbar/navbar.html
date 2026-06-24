@@ -1,33 +1,61 @@
+
+ <!--Θέλουμε επίσης να εξαφανίζεται όταν αλλάζει η σελίδα!-->
+
 <nav>
-  <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a> |
-  @if (!authService.currentUser || authService.currentUser.role === userRole.Registered) {<!-- If the current user is a guest or a Registered user, we show them the browse events page !-->
-    <a routerLink="/events" routerLinkActive="active">Browse Events</a> |
-  }
-  @if (authService.currentUser ) { <!-- big if for non guest users !-->
-    @if (authService.currentUser.role === userRole.Registered) {
-      <a routerLink="/manage-events" routerLinkActive="active">Manage Events</a> |
-      <a routerLink="/messaging" routerLinkActive="active">Messaging</a> |
-    } @else { <!-- Admin view!-->
-      <a routerLink="/admin" routerLinkActive="active">Admin Page</a> |
+  <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+    Home
+  </a>
+  |
+
+  <!-- Browse Events is public: guests and logged-in users can see it -->
+  <a routerLink="/events" routerLinkActive="active"> <!-- If the current user is a guest or a Registered user, we show them the browse events page !-->
+    Browse Events
+  </a>
+  |
+
+  @if (authService.currentUser(); as user) {
+    <!-- Logged-in user area -->
+
+    @if (authService.hasRole('user')) {
+      <a routerLink="/manage-events" routerLinkActive="active">
+        Manage Events
+      </a>
+      |
+
+      <a routerLink="/messaging" routerLinkActive="active">
+        Messaging
+      </a>
+      |
     }
+
+    @if (authService.hasRole('admin')) {
+      <a routerLink="/admin" routerLinkActive="active">
+        Admin Page
+      </a>
+      |
+    }
+
+    Welcome, {{ user.username }}
+
+    <button (click)="authService.logout()">
+      Log out
+    </button>
+  } @else {
+    <!-- Guest area -->
+      <!-- Log-In and sign-up buttons only show up for guests !-->
+      Welcome, Guest |
+
+    <button (click)="changeShowLoginForm()">
+      Log in
+    </button>
+    |
+
+    <a routerLink="/signup" routerLinkActive="active">
+      Sign up
+    </a>
   }
-  Welcome,
-  @if (authService.currentUser){ <!-- If the currentUser is not null, then the username variable is valid and we show it!-->
-    {{authService.currentUser.username}}
-  } @else { <!-- If the current user IS null, then we know it is a guest :)!-->
-    Guest |
-  }
-  @if (!authService.currentUser) { <!-- Log-In and sign-up buttons only show up for guests !-->
-    <button (click)="changeShowLoginForm()">Log-in</button> |
-    <a routerLink="/signup" routerLinkActive="active"> Sign-up</a>
-  }
-  <!-- TEMPORARY TEST BUTTONS !-->
-  <button (click)="authService.logInAsAdmin()">Change role to admin</button> |
-  <button (click)="authService.logInAsRegistered()">Change role to user</button>
-  <button (click)="authService.logout()">LogOut</button>
 </nav>
+
 @if (showLoginForm) {
   <app-login-form></app-login-form>
 }
-
- <!--Θέλουμε επίσης να εξαφανίζεται όταν αλλάζει η σελίδα!-->
