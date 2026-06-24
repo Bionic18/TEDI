@@ -15,7 +15,8 @@ import { Messaging } from './features/messaging/messaging';
 import { Navbar } from './shared/components/navbar/navbar';
 import { LoginForm } from './shared/components/login-form/login-form';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { HTTP_INTERCEPTORS,provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
+import {AuthInterceptor} from './core/services/interceptor';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,10 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
     LoginForm,
   ],
     imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule],
-  providers: [provideBrowserGlobalErrorListeners(), provideHttpClient(withFetch())],
+  providers: [
+    provideBrowserGlobalErrorListeners(), provideHttpClient(withFetch(),
+      withInterceptorsFromDi()), {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true,},
+  ],
   bootstrap: [App],
 })
 export class AppModule {}
