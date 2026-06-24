@@ -1,38 +1,50 @@
 <h1>My Events</h1>
 
-@for (event of nonDrafts; track event.id) {
-
-  <li>
-    <h3>{{ event.name }}</h3>
-    <p> {{ event.startDateTime | date:'dd/MM/yyyy HH:mm' }} </p>
-    <p>Status: {{ event.status }}</p>
-    <a [routerLink]="['/events', event.id]"> View Details  </a>
-    <a [routerLink]="['/manage-events/edit', event.id]">Edit</a>
-<!--    <button (click)="eventService.cancelEvent(event.id)" >Cancel </button>-->
-  </li>
+@if (nonDrafts().length === 0) {
+  <p>No published events found.</p>
 }
+
+
+  @for (event of nonDrafts(); track event.id) {
+    <li>
+      <h3>{{ event.name }}</h3>
+      <p>{{ event.startDateTime | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p>Status: {{ event.status }}</p>
+
+      <a [routerLink]="['/events', event.id]">View Details</a>
+      |
+      <a [routerLink]="['/manage-events/edit', event.id]">Edit</a>
+    </li>
+  }
 
 <h1>My Drafts</h1>
 
-@for (draftEvent of drafts; track draftEvent.id){
-  <li>
-    <h3>{{draftEvent.name}}</h3>
-    <p>Status: {{draftEvent.status}}</p>
-    <button (click)="publishEvent(draftEvent.id)">
-    <!--    [disabled]="!eventService.canPublish(draftEvent)"-->
-<!--            [title]="!eventService.canPublish(draftEvent)-->
-<!--      ? 'This event cannot be published because required information is missing.'-->
-<!--      : 'Publish event'"-->
-      Publish </button>
-<!--    @if (!eventService.canPublish(draftEvent)) {-->
-<!--      <p>-->
-<!--        This event cannot be published because required-->
-<!--        information is missing.-->
-<!--      </p>-->
-<!--    }-->
-    <button [routerLink]="['/manage-events/edit', draftEvent.id]">Edit Draft</button>
-    <button (click)="deleteDraft(draftEvent.id)">Delete Draft</button>
-  </li>
+@if (drafts().length === 0) {
+  <p>No drafts found.</p>
 }
 
-<button [routerLink]="['/manage-events/create']"> Create New Event</button>
+  @for (draftEvent of drafts(); track draftEvent.id) {
+    <li>
+      <h3>{{ draftEvent.name }}</h3>
+      <p>Status: {{ draftEvent.status }}</p>
+
+      <button
+        (click)="publishEvent(draftEvent.id)"
+        [disabled]="!canPublish(draftEvent)"
+      >
+        Publish
+      </button>
+
+      <button [routerLink]="['/manage-events', draftEvent.id, 'edit']">
+        Edit Draft
+      </button>
+
+      <button (click)="deleteDraft(draftEvent.id)">
+        Delete Draft
+      </button>
+    </li>
+  }
+
+<button [routerLink]="['/manage-events/create']">
+  Create New Event
+</button>

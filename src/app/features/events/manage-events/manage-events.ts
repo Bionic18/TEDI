@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Event } from '../../../core/models/events';
 import { EventService } from '../../../core/services/event-service';
 import { AuthService } from '../../../core/services/auth-service';
-import {EventStatus} from '../../../core/models/eventStatus';
+import { EventStatus } from '../../../core/models/eventStatus';
 
 @Component({
   selector: 'app-manage-events',
@@ -11,50 +11,35 @@ import {EventStatus} from '../../../core/models/eventStatus';
   styleUrl: './manage-events.css',
 })
 export class ManageEvents {
-  eventService = inject(EventService);
+  private eventService = inject(EventService);
   authService = inject(AuthService);
 
-  events: Event[] = [];
-  drafts: Event[] = [];
-  nonDrafts: Event[] = [];
+  events = signal<Event[]>([]);
+
+  drafts = computed(() =>
+    this.events().filter(event => event.status === EventStatus.Draft)
+  );
+
+  nonDrafts = computed(() =>
+    this.events().filter(event => event.status !== EventStatus.Draft)
+  );
 
   ngOnInit() {
-    const currentUser = this.authService.currentUser;
-
-    if (!currentUser) {
-      return;
-    }
-
     this.loadEvents();
   }
 
   loadEvents(): void {
-    const currentUser = this.authService.currentUser;
+    const currentUser = this.authService.currentUser();
 
     if (!currentUser) {
+      this.events.set([]);
       return;
     }
 
-    /*
-      TODO:
-      Ideally this should become:
-      this.eventService.getAllEvents({ organizerId: currentUser.id })
-
-      But your current mock AuthService probably has username/role,
-      not backend id yet.
-    */
-
-    this.eventService.getAllEvents().subscribe({
+    this.eventService.getAllEvents({ organizerId: currentUser.id }).subscribe({
       next: (events) => {
-        this.events = events;
-
-        this.nonDrafts = this.events.filter(
-          event => event.status !== EventStatus.Draft
-        );
-
-        this.drafts = this.events.filter(
-          event => event.status === EventStatus.Draft
-        );
+        console.log('Managed events loaded:', events);
+        this.events.set(events);
       },
       error: (err) => {
         console.error('Failed to load managed events', err);
@@ -102,3 +87,4 @@ export class ManageEvents {
     );
   }
 }
+
