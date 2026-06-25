@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
 import { AuthService } from '../../../core/services/auth-service';
 
 @Component({
@@ -9,22 +9,32 @@ import { AuthService } from '../../../core/services/auth-service';
 })
 export class LoginForm {
   authService = inject(AuthService);
+
   @Output() loginSuccess = new EventEmitter<void>();
 
   username = '';
   password = '';
-  errorMessage = '';
+
+  errorMessage = signal('');
+  isSubmitting = signal(false);
 
   save(): void {
+    this.errorMessage.set('');
+    this.isSubmitting.set(true);
+
     this.authService.login(this.username, this.password).subscribe({
       next: (user) => {
         console.log('Logged in as:', user);
-        this.errorMessage = '';
+
+        this.errorMessage.set('');
+        this.isSubmitting.set(false);
         this.loginSuccess.emit();
       },
       error: (err) => {
         console.error('Login failed', err);
-        this.errorMessage = 'Invalid username or password';
+
+        this.errorMessage.set('Invalid username or password.');
+        this.isSubmitting.set(false);
       },
     });
   }

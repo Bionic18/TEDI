@@ -20,7 +20,14 @@
   @if (passwordCtrl.invalid &&passwordCtrl.touched) {
     <p>Password is required.</p>
   }
-  <button type="submit" [disabled]="loginForm.invalid">
-    Log-in
+  <button type="submit" [disabled]="isSubmitting() || loginForm.invalid" >
+    @if (isSubmitting()) {
+      Logging in...
+    } @else {
+      Log in
+    }
   </button>
+  @if (errorMessage()) {
+    <p class="error-message">{{ errorMessage() }}</p>
+  }
 </form>
