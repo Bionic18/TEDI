@@ -36,4 +36,37 @@
     <h3>Capacity</h3>
     <p>{{ event.capacity }} attendees</p>
   </div>
+  <div>
+    <h3>Reservation</h3>
+
+    @if (!authService.currentUser()) {
+      <p>You must log in to reserve tickets for this event.</p>
+    } @else if (event.status !== 'PUBLISHED') {
+      <p>This event is not currently available for reservations.</p>
+    } @else if (!authService.hasRole('user')) {
+      <p>Only registered participants can reserve tickets.</p>
+    } @else {
+      <label>Number of tickets</label>
+
+      <input
+        type="number"
+        min="1"
+        [max]="event.capacity"
+        [ngModel]="ticketQuantity()"
+        (ngModelChange)="updateTicketQuantity($event)"
+      >
+
+      <button type="button" (click)="submitReservation()">
+        Reserve Tickets
+      </button>
+    }
+
+    @if (reservationMessage()) {
+      <p class="success-message">{{ reservationMessage() }}</p>
+    }
+
+    @if (reservationError()) {
+      <p class="error-message">{{ reservationError() }}</p>
+    }
+  </div>
 }
