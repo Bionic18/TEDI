@@ -59,11 +59,13 @@ export class EventService {
   deleteEvent(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+  publishEvent(id: number): Observable<Event> {
+    return this.http.patch<Event>(`${this.baseUrl}/${id}/publish`, {});
+  }
 }
 
 // TODO:
 // Replace with backend endpoints once available:
-// publishEvent
 // cancelEvent
 
 // cancelEvent(eventID: number): void {
@@ -76,36 +78,3 @@ export class EventService {
 //
 // }
 //
-// publishEvent(eventID: number): boolean {
-//
-//   const event = this.getEventByID(eventID);
-//
-//   if (!event) {
-//     return false;
-//   }
-//
-//   if (!this.canPublish(event)) {
-//     return false;
-//   }
-//
-//   event.status = EventStatus.Published;
-//
-//   return true;
-// }
-//
-// canPublish(event: Event): boolean {
-//
-//   return !!(
-//     event.name &&
-//     event.description &&
-//     event.venue &&
-//     event.address &&
-//     event.city &&
-//     event.country &&
-//     event.capacity > 0 &&
-//     event.startDateTime &&
-//     event.endDateTime &&
-//     event.startDateTime < event.endDateTime
-//   );
-//
-// }

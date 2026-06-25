@@ -1,5 +1,4 @@
-<form [formGroup]="newEventForm"
-(ngSubmit)="onSubmit()">
+<form [formGroup]="newEventForm">
 
   <label>Event Name</label>
   <input type="text" formControlName="name">
@@ -103,8 +102,23 @@
     <p>Capacity is required.</p>
   }
 
-  <button type="submit" [disabled]="newEventForm.invalid">Create Event</button>
-<!--  <button type="button" (click)="saveDraft()">Save Draft</button>-->
-<!--  add a button to say "Draft added"-->
+  @if (errorMessage) {
+    <p>{{ errorMessage }}</p>
+  }
 
+  <button
+    type="button"
+    [disabled]="newEventForm.invalid || isSubmitting"
+    (click)="saveDraft()"
+  >
+    Save Draft
+  </button>
+
+  <button
+    type="submit"
+    [disabled]="newEventForm.invalid || isSubmitting"
+    (click)="publish()"
+  >
+    Publish
+  </button>
 </form>
