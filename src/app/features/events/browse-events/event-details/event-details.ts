@@ -39,6 +39,7 @@ export class EventDetails {
     this.eventService.getEventByID(eventID).subscribe({
       next: (event) => {
         this.currentEvent.set(event);
+        this.trackViewedEvent(event.id);
       },
       error: (err) => {
         console.error('Failed to load event details', err);
@@ -95,6 +96,30 @@ export class EventDetails {
 
     this.reservationMessage.set(
       'Reservation form is ready. The reservation endpoint has not been implemented yet.'
+    );
+  }
+  private trackViewedEvent(eventID: number): void { //creates viewed events in local storage for current user
+    const currentUser = this.authService.currentUser();
+
+    if (!currentUser) {
+      return;
+    }
+
+    const storageKey = `viewedEvents-${currentUser.id}`;
+
+    const storedValue = localStorage.getItem(storageKey);
+    const viewedEventIDs: number[] = storedValue
+      ? JSON.parse(storedValue)
+      : [];
+
+    const updatedViewedEventIDs = [
+      eventID,
+      ...viewedEventIDs.filter(id => id !== eventID),
+    ].slice(0, 20); //keep 20 viewed events
+
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify(updatedViewedEventIDs)
     );
   }
 }
