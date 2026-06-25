@@ -38,7 +38,6 @@ export class ManageEvents {
 
     this.eventService.getAllEvents({ organizerId: currentUser.id }).subscribe({
       next: (events) => {
-        console.log('Managed events loaded:', events);
         this.events.set(events);
       },
       error: (err) => {

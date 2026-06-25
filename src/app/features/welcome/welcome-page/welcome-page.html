@@ -1,7 +1,35 @@
-<h1>welcome Guest!</h1>
+@if (authService.currentUser(); as user) {
+  <h1>Welcome, {{ user.username }}!</h1>
 
-<button>Click here to browse events:</button> <!-- redirect to browse page-->
-<!-- I want these to have a line break-->
-<button>Sign Up here</button> <!-- redirect to sign-up page-->
-<p>Or, login here if you already have an account</p>
-<!-- add login form-->
+  @if (authService.hasRole('admin')) {
+    <p>You are logged in as an administrator.</p>
+
+    <button routerLink="/admin">
+      Go to Admin Page
+    </button>
+  }
+
+  @if (authService.hasRole('user')) {
+    <p>What would you like to do?</p>
+
+    <button routerLink="/events">
+      Browse Events
+    </button>
+
+    <button routerLink="/manage-events">
+      Manage My Events
+    </button>
+  }
+} @else {
+  <h1>Welcome, Guest!</h1>
+
+  <p>You can browse public events, sign up, or log in if you already have an account in the navbar above.</p>
+
+  <button routerLink="/events">
+    Browse Events
+  </button>
+
+  <button routerLink="/signup">
+    Sign Up
+  </button>
+}

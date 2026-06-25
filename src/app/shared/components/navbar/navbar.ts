@@ -9,8 +9,7 @@ import { AuthService } from '../../../core/services/auth-service';
 })
 export class Navbar {
   authService = inject(AuthService);
-    showLoginForm = false;
   changeShowLoginForm () {
-    this.showLoginForm = !this.showLoginForm;
+    this.authService.showLoginForm = !this.authService.showLoginForm;
   }
 }

@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import {AuthService} from '../../../core/services/auth-service';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { AuthService } from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-login-form',
@@ -9,10 +9,10 @@ import {AuthService} from '../../../core/services/auth-service';
 })
 export class LoginForm {
   authService = inject(AuthService);
+  @Output() loginSuccess = new EventEmitter<void>();
 
   username = '';
   password = '';
-
   errorMessage = '';
 
   save(): void {
@@ -20,6 +20,7 @@ export class LoginForm {
       next: (user) => {
         console.log('Logged in as:', user);
         this.errorMessage = '';
+        this.loginSuccess.emit();
       },
       error: (err) => {
         console.error('Login failed', err);
@@ -28,4 +29,3 @@ export class LoginForm {
     });
   }
 }
-//TODO:make this disappear once it's clicked

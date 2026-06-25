@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
+import {AuthService} from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-welcome-page',
@@ -6,4 +7,10 @@ import { Component } from '@angular/core';
   templateUrl: './welcome-page.html',
   styleUrl: './welcome-page.css',
 })
-export class WelcomePage {}
+export class WelcomePage {
+  authService = inject(AuthService);
+
+  changeShowLoginForm(): void {
+    this.authService.showLoginForm = !this.authService.showLoginForm;
+  }
+}

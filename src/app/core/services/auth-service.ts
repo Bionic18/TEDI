@@ -26,6 +26,7 @@ interface JwtPayload {
 export class AuthService {
   private http = inject(HttpClient);
   private readonly baseUrl = 'http://localhost:3000/auth';
+  showLoginForm = false;
 
   currentUser = signal<AuthUser | null>(this.loadUserFromStoredToken());
 

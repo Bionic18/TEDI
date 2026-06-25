@@ -56,6 +56,6 @@
   }
 </nav>
 
-@if (showLoginForm) {
-  <app-login-form></app-login-form>
+@if (this.authService.showLoginForm) {
+  <app-login-form (loginSuccess)="this.authService.showLoginForm = false"></app-login-form>
 }
