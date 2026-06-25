@@ -1,1 +1,63 @@
-<p>admin works!</p>
+<h1>Admin Dashboard</h1>
+
+<p>
+  From this page, the administrator can export event data in JSON or XML format.
+</p>
+
+@if (isLoading()) {
+  <p>Loading events...</p>
+}
+
+@if (errorMessage()) {
+  <p class="error-message">{{ errorMessage() }}</p>
+}
+
+@if (!isLoading() && events().length > 0) {
+  <section>
+    <h2>Event Export</h2>
+
+    <p>
+      Loaded {{ events().length }} event(s).
+    </p>
+
+    <button type="button" (click)="exportJson()">
+      Export JSON
+    </button>
+
+    <button type="button" (click)="exportXml()">
+      Export XML
+    </button>
+  </section>
+
+  <section>
+    <h2>Events</h2>
+
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Venue</th>
+        <th>City</th>
+        <th>Status</th>
+      </tr>
+      </thead>
+
+      <tbody>
+        @for (event of events(); track event.id) {
+          <tr>
+            <td>{{ event.id }}</td>
+            <td>{{ event.name }}</td>
+            <td>{{ event.venue }}</td>
+            <td>{{ event.city }}</td>
+            <td>{{ event.status }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+}
+
+@if (!isLoading() && events().length === 0) {
+  <p>No events available for export.</p>
+}
