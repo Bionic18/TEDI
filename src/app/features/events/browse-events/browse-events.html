@@ -1,22 +1,112 @@
-@if (events().length === 0) {
+<h1>Browse Events</h1>
+
+<section>
+  <h2>Search Events</h2>
+
+  <label>Title or description</label>
+  <input
+    type="text"
+    [ngModel]="searchTerm()"
+    (ngModelChange)="updateSearchTerm($event)"
+    placeholder="Search by title or description"
+  >
+
+  <label>Location</label>
+  <input
+    type="text"
+    [ngModel]="locationTerm()"
+    (ngModelChange)="updateLocationTerm($event)"
+    placeholder="Venue, address, city, or country"
+  >
+
+  <label>From date</label>
+  <input
+    type="date"
+    [ngModel]="startDate()"
+    (ngModelChange)="updateStartDate($event)"
+  >
+
+  <label>Until date</label>
+  <input
+    type="date"
+    [ngModel]="endDate()"
+    (ngModelChange)="updateEndDate($event)"
+  >
+
+  <button type="button" (click)="clearFilters()">
+    Clear Filters
+  </button>
+</section>
+
+<p>
+  Showing {{ filteredEvents().length }} result(s)
+</p>
+
+@if (filteredEvents().length === 0) {
   <p>No events found.</p>
-}
+} @else {
+  <table>
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Date</th>
+      <th>Location</th>
+      <th>Status</th>
+      <th>Details</th>
+    </tr>
+    </thead>
 
-@for (temp_event of events(); track temp_event.id) {
-    <li>
-      <h1>{{ temp_event.name }}</h1>
-      <p>{{ temp_event.description }}</p>
+    <tbody>
+      @for (temp_event of paginatedEvents(); track temp_event.id) {
+        <tr>
+          <td>{{ temp_event.name }}</td>
 
-      <p>
-        {{ temp_event.startDateTime | date:'dd/MM/yyyy HH:mm' }}
-        -
-        {{ temp_event.endDateTime | date:'dd/MM/yyyy HH:mm' }}
-      </p>
+          <td>{{ temp_event.description }}</td>
 
-      <p>Status: {{ temp_event.status }}</p>
+          <td>
+            {{ temp_event.startDateTime | date:'dd/MM/yyyy HH:mm' }}
+            -
+            {{ temp_event.endDateTime | date:'dd/MM/yyyy HH:mm' }}
+          </td>
 
-      <a [routerLink]="['/events', temp_event.id]">
-        <button>View Details</button>
-      </a>
-    </li>
+          <td>
+            {{ temp_event.venue }},
+            {{ temp_event.city }},
+            {{ temp_event.country }}
+          </td>
+
+          <td>{{ temp_event.status }}</td>
+
+          <td>
+            <a [routerLink]="['/events', temp_event.id]">
+              <button type="button">View Details</button>
+            </a>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <section>
+    <button
+      type="button"
+      (click)="previousPage()"
+      [disabled]="currentPage() === 1"
+    >
+      Previous
+    </button>
+
+    <span>
+      Page {{ currentPage() }} of {{ totalPages() }}
+    </span>
+
+    <button
+      type="button"
+      (click)="nextPage()"
+      [disabled]="currentPage() === totalPages()"
+    >
+      Next
+    </button>
+  </section>
 }
