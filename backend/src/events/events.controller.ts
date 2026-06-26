@@ -10,6 +10,7 @@ import {
   Query,
   Req,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { EventsService, FindAllFilter } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -67,7 +68,19 @@ export class EventsController {
   ) {
     return this.eventsService.update(id, updateEventDto, req.user.userId);
   }
+// Authenticated + must be the organizer. Publishes a draft event.
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/publish')
+  publish(@Param('id', ParseIntPipe) id: number, @Req() req: AuthedRequest) {
+    return this.eventsService.publish(id, req.user.userId);
+  }
 
+// Authenticated + must be the organizer. Cancels a published event.
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/cancel')
+  cancel(@Param('id', ParseIntPipe) id: number, @Req() req: AuthedRequest) {
+    return this.eventsService.cancel(id, req.user.userId);
+  }
   // Authenticated + must be the organizer. Only DRAFT events can be deleted.
   @UseGuards(JwtAuthGuard)
   @Delete(':id')

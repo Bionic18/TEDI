@@ -91,7 +91,37 @@ export class EventsService {
       this.handlePrismaError(error);
     }
   }
+  async publish(id: number, userId: number) {
+    const event = await this.findOne(id);
+    this.assertOwnership(event.organizerId, userId);
 
+    if (event.status !== EventStatus.DRAFT) {
+      throw new BadRequestException('Only DRAFT events can be published.');
+    }
+
+    return this.prisma.event.update({
+      where: { id },
+      data: {
+        status: EventStatus.PUBLISHED,
+      },
+    });
+  }
+
+  async cancel(id: number, userId: number) {
+    const event = await this.findOne(id);
+    this.assertOwnership(event.organizerId, userId);
+
+    if (event.status !== EventStatus.PUBLISHED) {
+      throw new BadRequestException('Only PUBLISHED events can be cancelled.');
+    }
+
+    return this.prisma.event.update({
+      where: { id },
+      data: {
+        status: EventStatus.CANCELLED,
+      },
+    });
+  }
   async remove(id: number, userId: number) {
     const event = await this.findOne(id);
     this.assertOwnership(event.organizerId, userId);

@@ -66,9 +66,31 @@ export class ManageEvents {
   }
 
   publishEvent(eventID: number): void {
-    // TODO:
-    // Needs backend endpoint, e.g. PATCH /events/:id/publish
-    console.warn('Publish endpoint not implemented yet', eventID);
+    this.eventService.publishEvent(eventID).subscribe({
+      next: () => {
+        this.loadEvents();
+      },
+      error: (err) => {
+        console.error('Failed to publish event', err);
+      },
+    });
+  }
+
+  cancelEvent(eventID: number): void {
+    const confirmed = confirm('Are you sure you want to cancel this event?');
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.eventService.cancelEvent(eventID).subscribe({
+      next: () => {
+        this.loadEvents();
+      },
+      error: (err) => {
+        console.error('Failed to cancel event', err);
+      },
+    });
   }
 
   canPublish(event: Event): boolean {

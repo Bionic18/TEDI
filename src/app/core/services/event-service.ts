@@ -62,6 +62,10 @@ export class EventService {
   publishEvent(id: number): Observable<Event> {
     return this.http.patch<Event>(`${this.baseUrl}/${id}/publish`, {});
   }
+
+  cancelEvent(id: number): Observable<Event> {
+    return this.http.patch<Event>(`${this.baseUrl}/${id}/cancel`, {});
+  }
 }
 
 // TODO:

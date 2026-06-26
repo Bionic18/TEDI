@@ -13,7 +13,13 @@
 
       <a [routerLink]="['/events', event.id]">View Details</a>
       |
-      <a [routerLink]="['/manage-events/edit', event.id]">Edit</a>
+      <a [routerLink]="['/manage-events/edit', event.id]">Edit</a>a
+      @if (event.status === 'PUBLISHED') {
+        |
+        <button type="button" (click)="cancelEvent(event.id)">
+          Cancel Event
+        </button>
+      }
     </li>
   }
 
