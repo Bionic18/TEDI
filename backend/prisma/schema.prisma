@@ -23,6 +23,7 @@ model User {
   active       Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  bookings Booking[]
 
   // An organizer is just a registered user who has created events.
   organizedEvents Event[] @relation("OrganizedEvents")
@@ -56,5 +57,53 @@ model Event {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  ticketTypes TicketType[]
+  bookings    Booking[]
+
   @@index([organizerId])
+}
+model TicketType {
+  id        Int    @id @default(autoincrement())
+  name      String
+  price     Float
+  quantity  Int
+  available Int
+
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId Int
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+}
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model Booking {
+  id              Int           @id @default(autoincrement())
+  numberOfTickets Int
+  totalCost       Float
+  status          BookingStatus @default(CONFIRMED)
+
+  event   Event @relation(fields: [eventId], references: [id])
+  eventId Int
+
+  ticketType   TicketType @relation(fields: [ticketTypeId], references: [id])
+  ticketTypeId Int
+
+  attendee   User @relation(fields: [attendeeId], references: [id])
+  attendeeId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([ticketTypeId])
+  @@index([attendeeId])
 }

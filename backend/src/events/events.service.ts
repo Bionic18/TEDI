@@ -27,22 +27,36 @@ export class EventsService {
         ...(filter.status ? { status: filter.status } : {}),
         ...(filter.organizerId ? { organizerId: filter.organizerId } : {}),
       },
+      include: {
+        ticketTypes: true,
+      },
       orderBy: { startDateTime: 'asc' },
     });
   }
-
   async findOne(id: number) {
-    const event = await this.prisma.event.findUnique({ where: { id } });
+    const event = await this.prisma.event.findUnique({
+      where: { id },
+      include: {
+        ticketTypes: true,
+        bookings: true,
+      },
+    });
+
     if (!event) {
       throw new NotFoundException('Event not found');
     }
+
     return event;
   }
-
   async create(createEventDto: CreateEventDto, organizerId: number) {
     this.assertDateRange(
       createEventDto.startDateTime,
       createEventDto.endDateTime,
+    );
+
+    const ticketTypes = this.prepareTicketTypes(
+      createEventDto.ticketTypes,
+      createEventDto.capacity,
     );
 
     return this.prisma.event.create({
@@ -58,24 +72,65 @@ export class EventsService {
         capacity: createEventDto.capacity,
         status: EventStatus.DRAFT,
         organizerId,
+        ticketTypes: {
+          create: ticketTypes,
+        },
+      },
+      include: {
+        ticketTypes: true,
       },
     });
+  }
+
+  private prepareTicketTypes(
+    ticketTypes: CreateEventDto['ticketTypes'],
+    capacity: number,
+  ) {
+    const normalizedTicketTypes =
+      ticketTypes && ticketTypes.length > 0
+        ? ticketTypes
+        : [
+          {
+            name: 'General Admission',
+            price: 0,
+            quantity: capacity,
+          },
+        ];
+
+    const totalTicketQuantity = normalizedTicketTypes.reduce(
+      (sum, ticketType) => sum + ticketType.quantity,
+      0,
+    );
+
+    if (totalTicketQuantity > capacity) {
+      throw new BadRequestException(
+        'The total quantity of ticket types cannot exceed the event capacity.',
+      );
+    }
+
+    return normalizedTicketTypes.map((ticketType) => ({
+      name: ticketType.name,
+      price: ticketType.price,
+      quantity: ticketType.quantity,
+      available: ticketType.quantity,
+    }));
   }
 
   async update(id: number, updateEventDto: UpdateEventDto, userId: number) {
     const event = await this.findOne(id);
     this.assertOwnership(event.organizerId, userId);
 
-    // Validate the date range against the merged (current + incoming) values.
     const start = updateEventDto.startDateTime ?? event.startDateTime;
     const end = updateEventDto.endDateTime ?? event.endDateTime;
     this.assertDateRange(start, end);
+
+    const { ticketTypes, ...eventFields } = updateEventDto;
 
     try {
       return await this.prisma.event.update({
         where: { id },
         data: {
-          ...updateEventDto,
+          ...eventFields,
           ...(updateEventDto.startDateTime
             ? { startDateTime: new Date(updateEventDto.startDateTime) }
             : {}),
@@ -85,6 +140,9 @@ export class EventsService {
           ...(updateEventDto.status
             ? { status: updateEventDto.status as EventStatus }
             : {}),
+        },
+        include: {
+          ticketTypes: true,
         },
       });
     } catch (error) {
