@@ -45,19 +45,48 @@
       <p>This event is not currently available for reservations.</p>
     } @else if (!authService.hasRole('user')) {
       <p>Only registered participants can reserve tickets.</p>
+    } @else if (!event.ticketTypes || event.ticketTypes.length === 0) {
+      <p>No ticket types are available for this event.</p>
     } @else {
+      <label>Ticket type</label>
+
+      <select
+        [ngModel]="selectedTicketTypeId()"
+        (ngModelChange)="updateSelectedTicketType($event)"
+      >
+        @for (ticketType of event.ticketTypes; track ticketType.id) {
+          <option
+            [value]="ticketType.id"
+            [disabled]="ticketType.available === 0"
+          >
+            {{ ticketType.name }}
+            -
+            {{ ticketType.price }}€
+            -
+            {{ ticketType.available }} available
+          </option>
+        }
+      </select>
+
       <label>Number of tickets</label>
 
       <input
         type="number"
         min="1"
-        [max]="event.capacity"
         [ngModel]="ticketQuantity()"
         (ngModelChange)="updateTicketQuantity($event)"
       >
 
-      <button type="button" (click)="submitReservation()">
-        Reserve Tickets
+      <button
+        type="button"
+        (click)="submitReservation()"
+        [disabled]="isSubmittingReservation()"
+      >
+        @if (isSubmittingReservation()) {
+          Reserving...
+        } @else {
+          Reserve Tickets
+        }
       </button>
     }
 
