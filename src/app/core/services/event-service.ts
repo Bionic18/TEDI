@@ -15,8 +15,13 @@ export interface EventPayload {
   startDateTime: string;
   endDateTime: string;
   capacity: number;
+  ticketTypes?: TicketTypePayload[];
 }
-
+export interface TicketTypePayload {
+  name: string;
+  price: number;
+  quantity: number;
+}
 @Injectable({
   providedIn: 'root',
 })

@@ -1,71 +1,42 @@
 import { Component, inject } from '@angular/core';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
+import {FormArray} from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize, switchMap } from 'rxjs';
 import { EventService, EventPayload } from '../../../../core/services/event-service';
+import { EventFormService } from '../../../../core/services/event-form-service';
 
-export function dateRangeValidator(control: AbstractControl): ValidationErrors | null {
-  const start = control.get('startDateTime')?.value;
-  const end = control.get('endDateTime')?.value;
 
-  if (!start || !end) {
-    return null;
-  }
-  if (new Date(start) >= new Date(end)) {
-    return { invalidDateRange: true };
-  }
-  return null;
+interface TicketTypeFormValue {
+  name: string;
+  price: number | string;
+  quantity: number | string;
 }
-
-export function whitespaceValidator(control: AbstractControl): ValidationErrors | null {
-  const value = control.value;
-  if (!value) {
-    return null;
-  }
-  return value.trim() === '' ? { isOnlyWhitespace: true } : null;
-}
-
 @Component({
   selector: 'app-create-event',
   standalone: false,
   templateUrl: './create-event.html',
   styleUrl: './create-event.css',
 })
+
 export class CreateEvent {
   private eventService = inject(EventService);
   private router = inject(Router);
-
+  private eventFormService = inject(EventFormService);
   isSubmitting = false;
   errorMessage = '';
-  newEventForm = new FormGroup(
-    {
-      name: new FormControl('', [Validators.required, whitespaceValidator]),
-      description: new FormControl('', [Validators.required, whitespaceValidator]),
-      venue: new FormControl('', [Validators.required, whitespaceValidator]),
-      address: new FormControl('', [Validators.required, whitespaceValidator]),
-      city: new FormControl('', [Validators.required, whitespaceValidator]),
-      country: new FormControl('', [Validators.required, whitespaceValidator]),
-      startDateTime: new FormControl('', Validators.required),
-      endDateTime: new FormControl('', Validators.required),
-      capacity: new FormControl('', [Validators.required, Validators.min(1)]),
-    },
-    {
-      validators: dateRangeValidator,
-    },
-  );
+  newEventForm = this.eventFormService.createForm();
 
   saveDraft(): void {
-    if (this.newEventForm.invalid) {
+    if (this.newEventForm.errors?.['ticketTypesExceedCapacity']) {
+      alert('Total ticket quantity cannot exceed event capacity.');
       this.newEventForm.markAllAsTouched();
       return;
     }
 
+    if (this.newEventForm.invalid) {
+      this.newEventForm.markAllAsTouched();
+      return;
+    }
     const payload = this.buildPayload();
 
     this.isSubmitting = true;
@@ -86,11 +57,16 @@ export class CreateEvent {
   }
 
   publish(): void {
-    if (this.newEventForm.invalid) {
+    if (this.newEventForm.errors?.['ticketTypesExceedCapacity']) {
+      alert('Total ticket quantity cannot exceed event capacity.');
       this.newEventForm.markAllAsTouched();
       return;
     }
 
+    if (this.newEventForm.invalid) {
+      this.newEventForm.markAllAsTouched();
+      return;
+    }
     const payload = this.buildPayload();
 
     this.isSubmitting = true;
@@ -117,22 +93,71 @@ export class CreateEvent {
   }
 
   private buildPayload(): EventPayload {
-    const raw = this.newEventForm.value;
+    const raw = this.newEventForm.getRawValue() as {
+      name: string;
+      description: string;
+      venue: string;
+      address: string;
+      city: string;
+      country: string;
+      startDateTime: string;
+      endDateTime: string;
+      capacity: number | string;
+      ticketTypes: TicketTypeFormValue[];
+    };
+
     return {
-      name: raw.name!,
-      description: raw.description!,
-      venue: raw.venue!,
-      address: raw.address!,
-      city: raw.city!,
-      country: raw.country!,
-      startDateTime: raw.startDateTime!,
-      endDateTime: raw.endDateTime!,
+      name: raw.name,
+      description: raw.description,
+      venue: raw.venue,
+      address: raw.address,
+      city: raw.city,
+      country: raw.country,
+      startDateTime: raw.startDateTime,
+      endDateTime: raw.endDateTime,
       capacity: Number(raw.capacity),
+      ticketTypes: raw.ticketTypes.map((ticketType: TicketTypeFormValue) => ({
+        name: ticketType.name.trim(),
+        price: Number(ticketType.price),
+        quantity: Number(ticketType.quantity),
+      })),
     };
   }
 
   hasError(controlName: string, errorName: string): boolean {
     const control = this.newEventForm.get(controlName);
+    return !!(control?.errors?.[errorName] && control.touched);
+  }
+
+  get ticketTypes(): FormArray {
+    return this.newEventForm.get('ticketTypes') as FormArray;
+  }
+
+  addTicketType(): void {
+    this.ticketTypes.push(
+      this.eventFormService.createTicketTypeGroup('', 0, 1),
+    );
+
+    this.newEventForm.updateValueAndValidity();
+  }
+
+  removeTicketType(index: number): void {
+    if (this.ticketTypes.length === 1) {
+      return;
+    }
+
+    this.ticketTypes.removeAt(index);
+    this.newEventForm.updateValueAndValidity();
+  }
+
+  ticketTypeQuantitySum(): number {
+    return this.ticketTypes.controls.reduce((sum, ticketTypeControl) => {
+      return sum + Number(ticketTypeControl.get('quantity')?.value || 0);
+    }, 0);
+  }
+
+  hasTicketTypeError(index: number, controlName: string, errorName: string): boolean {
+    const control = this.ticketTypes.at(index).get(controlName);
     return !!(control?.errors?.[errorName] && control.touched);
   }
 }

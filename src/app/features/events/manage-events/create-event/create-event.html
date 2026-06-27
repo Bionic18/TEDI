@@ -105,7 +105,70 @@
   @if (errorMessage) {
     <p>{{ errorMessage }}</p>
   }
+  <h3>Ticket Types</h3>
 
+  <div formArrayName="ticketTypes">
+    @for (ticketType of ticketTypes.controls; track $index; let i = $index) {
+      <div [formGroupName]="i">
+        <h4>Ticket Type {{ i + 1 }}</h4>
+
+        <label>Ticket Name</label>
+        <input type="text" formControlName="name">
+
+        @if (hasTicketTypeError(i, "name", "required")) {
+          <p>Ticket type name is required.</p>
+        }
+
+        @if (hasTicketTypeError(i, "name", "isOnlyWhitespace")) {
+          <p>Ticket type name cannot contain only whitespace.</p>
+        }
+
+        <label>Price</label>
+        <input type="number" formControlName="price">
+
+        @if (hasTicketTypeError(i, "price", "required")) {
+          <p>Ticket price is required.</p>
+        }
+
+        @if (hasTicketTypeError(i, "price", "min")) {
+          <p>Ticket price cannot be negative.</p>
+        }
+
+        <label>Quantity</label>
+        <input type="number" formControlName="quantity">
+
+        @if (hasTicketTypeError(i, "quantity", "required")) {
+          <p>Ticket quantity is required.</p>
+        }
+
+        @if (hasTicketTypeError(i, "quantity", "min")) {
+          <p>Ticket quantity must be at least 1.</p>
+        }
+
+        <button
+          type="button"
+          [disabled]="ticketTypes.length === 1"
+          (click)="removeTicketType(i)"
+        >
+          Remove Ticket Type
+        </button>
+      </div>
+    }
+  </div>
+
+  <button type="button" (click)="addTicketType()">
+    Add Ticket Type
+  </button>
+
+  <p>
+    Total ticket quantity: {{ ticketTypeQuantitySum() }}
+  </p>
+
+  @if (newEventForm.errors?.['ticketTypesExceedCapacity']) {
+    <p>
+      Total ticket quantity cannot exceed event capacity.
+    </p>
+  }
   <button
     type="button"
     [disabled]="newEventForm.invalid || isSubmitting"
@@ -115,7 +178,7 @@
   </button>
 
   <button
-    type="submit"
+    type="button"
     [disabled]="newEventForm.invalid || isSubmitting"
     (click)="publish()"
   >
