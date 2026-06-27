@@ -24,6 +24,9 @@ export class BrowseEvents {
   startDate = signal('');
   endDate = signal('');
 
+  minPrice = signal('');
+  maxPrice = signal('');
+
   showRecommendedOnly = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
@@ -35,6 +38,8 @@ export class BrowseEvents {
     const location = this.locationTerm().trim().toLowerCase();
     const start = this.startDate();
     const end = this.endDate();
+    const minPrice = this.minPrice();
+    const maxPrice = this.maxPrice();
 
     return this.events().filter(event => {
       const matchesSearch =
@@ -61,12 +66,32 @@ export class BrowseEvents {
 
       const matchesEndDate =
         !end || eventStartDate <= new Date(end);
+      const minPriceNumber =
+        minPrice === '' ? null : Number(minPrice);
 
+      const maxPriceNumber =
+        maxPrice === '' ? null : Number(maxPrice);
+
+      const ticketPrices = event.ticketTypes?.map(ticketType => ticketType.price) ?? [];
+
+      const matchesPrice =
+        minPriceNumber === null && maxPriceNumber === null
+          ? true
+          : ticketPrices.some(price => {
+            const aboveMin =
+              minPriceNumber === null || price >= minPriceNumber;
+
+            const belowMax =
+              maxPriceNumber === null || price <= maxPriceNumber;
+
+            return aboveMin && belowMax;
+          });
       return (
         matchesSearch &&
         matchesLocation &&
         matchesStartDate &&
-        matchesEndDate
+        matchesEndDate &&
+        matchesPrice
       );
     });
   });
@@ -112,6 +137,8 @@ export class BrowseEvents {
     this.startDate.set('');
     this.endDate.set('');
     this.currentPage.set(1);
+    this.minPrice.set('');
+    this.maxPrice.set('');
   }
 
   previousPage(): void {
@@ -206,5 +233,14 @@ export class BrowseEvents {
     } catch {
       return [];
     }
+  }
+  updateMinPrice(value: string): void {
+    this.minPrice.set(value);
+    this.currentPage.set(1);
+  }
+
+  updateMaxPrice(value: string): void {
+    this.maxPrice.set(value);
+    this.currentPage.set(1);
   }
 }

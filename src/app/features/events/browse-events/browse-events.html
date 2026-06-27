@@ -32,6 +32,23 @@
     [ngModel]="endDate()"
     (ngModelChange)="updateEndDate($event)"
   >
+  <label>Minimum ticket price</label>
+  <input
+    type="number"
+    min="0"
+    [ngModel]="minPrice()"
+    (ngModelChange)="updateMinPrice($event)"
+    placeholder="Min price"
+  >
+
+  <label>Maximum ticket price</label>
+  <input
+    type="number"
+    min="0"
+    [ngModel]="maxPrice()"
+    (ngModelChange)="updateMaxPrice($event)"
+    placeholder="Max price"
+  >
   @if (authService.currentUser()) {
     <label>
       <input
@@ -70,6 +87,7 @@
       <th>Date</th>
       <th>Location</th>
       <th>Status</th>
+      <th>Ticket Prices</th>
       @if (showRecommendedOnly()) {
         <th>Recommendation Score</th>
       }
@@ -96,7 +114,18 @@
             {{ temp_event.country }}
           </td>
           <td>{{ temp_event.status }}</td>
-
+          <td>
+            @if (temp_event.ticketTypes && temp_event.ticketTypes.length > 0) {
+              @for (ticketType of temp_event.ticketTypes; track ticketType.id) {
+                <span>
+        {{ ticketType.name }}: {{ ticketType.price }}€
+      </span>
+                <br>
+              }
+            } @else {
+              No ticket types
+            }
+          </td>
           @if (showRecommendedOnly()) {
             <td>
               {{ temp_event.recommendationScore ?? '-' }}
