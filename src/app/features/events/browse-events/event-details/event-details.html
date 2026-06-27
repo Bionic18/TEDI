@@ -41,7 +41,9 @@
 
     @if (!authService.currentUser()) {
       <p>You must log in to reserve tickets for this event.</p>
-    } @else if (event.status !== 'PUBLISHED') {
+    } @else if (isCurrentUserOrganizerOfEvent()) {
+      <p>You cannot reserve tickets for your own event.</p>
+    }@else if (event.status !== 'PUBLISHED') {
       <p>This event is not currently available for reservations.</p>
     } @else if (!authService.hasRole('user')) {
       <p>Only registered participants can reserve tickets.</p>

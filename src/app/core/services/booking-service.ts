@@ -8,6 +8,27 @@ export interface CreateBookingPayload {
   numberOfTickets: number;
 }
 
+export interface EventBooking {
+  id: number;
+  numberOfTickets: number;
+  totalCost: number;
+  status: string;
+  eventId: number;
+  ticketTypeId: number;
+  attendeeId: number;
+  createdAt: string;
+  updatedAt: string;
+  ticketType?: {
+    id: number;
+    name: string;
+    price: number;
+  };
+  attendee?: {
+    id: number;
+    username: string;
+    email: string;
+  };
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -22,6 +43,11 @@ export class BookingService {
     return this.http.post<Booking>(
       `${this.baseUrl}/events/${eventId}/bookings`,
       payload
+    );
+  }
+  getEventBookings(eventId: number): Observable<EventBooking[]> {
+    return this.http.get<EventBooking[]>(
+      `${this.baseUrl}/events/${eventId}/bookings`
     );
   }
 }

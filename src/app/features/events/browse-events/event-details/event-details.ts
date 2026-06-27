@@ -66,7 +66,10 @@ export class EventDetails {
       this.reservationError.set('You must be logged in to reserve tickets.');
       return;
     }
-
+    if (this.isCurrentUserOrganizerOfEvent()) {
+      this.reservationError.set('You cannot reserve tickets for your own event.');
+      return;
+    }
     if (event.status !== EventStatus.Published) {
       this.reservationError.set('Reservations are only available for published events.');
       return;
@@ -174,5 +177,15 @@ export class EventDetails {
     this.selectedTicketTypeId.set(Number(value));
     this.reservationMessage.set('');
     this.reservationError.set('');
+  }
+  isCurrentUserOrganizerOfEvent(): boolean {
+    const event = this.currentEvent();
+    const user = this.authService.currentUser();
+
+    if (!event || !user) {
+      return false;
+    }
+
+    return event.organizerId === user.id;
   }
 }

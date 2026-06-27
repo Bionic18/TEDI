@@ -22,6 +22,11 @@ export class BookingsService {
         throw new NotFoundException('Event not found.');
       }
 
+      if (event.organizerId === attendeeId) {
+        throw new ForbiddenException(
+          'Organizers cannot reserve tickets for their own events.',
+        );
+      }
       if (event.status !== EventStatus.PUBLISHED) {
         throw new BadRequestException(
           'Reservations are only allowed for published events.',

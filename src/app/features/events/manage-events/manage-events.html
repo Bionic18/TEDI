@@ -20,6 +20,84 @@
           Cancel Event
         </button>
       }
+      |
+      <button
+        type="button"
+        (click)="viewBookings(event.id)"
+      >
+        @if (selectedBookingsEventId() === event.id) {
+          Hide Bookings
+        } @else {
+          View Bookings
+        }
+      </button>
+      @if (selectedBookingsEventId() === event.id) {
+        <section>
+          <h4>Bookings</h4>
+
+          @if (isLoadingBookings()) {
+            <p>Loading bookings...</p>
+          }
+
+          @if (bookingsErrorMessage()) {
+            <p>{{ bookingsErrorMessage() }}</p>
+          }
+
+          @if (!isLoadingBookings() && selectedEventBookings().length === 0) {
+            <p>No bookings for this event yet.</p>
+          }
+
+          @if (selectedEventBookings().length > 0) {
+            <table>
+              <thead>
+              <tr>
+                <th>Attendee</th>
+                <th>Ticket Type</th>
+                <th>Tickets</th>
+                <th>Total Cost</th>
+                <th>Status</th>
+                <th>Created At</th>
+              </tr>
+              </thead>
+
+              <tbody>
+                @for (booking of selectedEventBookings(); track booking.id) {
+                  <tr>
+                    <td>
+                      {{ booking.attendee?.username ?? 'Unknown user' }}
+
+                      @if (booking.attendee?.email) {
+                        <br>
+                        {{ booking.attendee?.email }}
+                      }
+                    </td>
+
+                    <td>
+                      {{ booking.ticketType?.name ?? 'Unknown ticket type' }}
+                    </td>
+
+                    <td>
+                      {{ booking.numberOfTickets }}
+                    </td>
+
+                    <td>
+                      {{ booking.totalCost }}€
+                    </td>
+
+                    <td>
+                      {{ booking.status }}
+                    </td>
+
+                    <td>
+                      {{ booking.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </section>
+      }
     </li>
   }
 

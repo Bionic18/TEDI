@@ -3,6 +3,7 @@ import { Event } from '../../../core/models/events';
 import { EventService } from '../../../core/services/event-service';
 import { AuthService } from '../../../core/services/auth-service';
 import { EventStatus } from '../../../core/models/eventStatus';
+import { BookingService, EventBooking } from '../../../core/services/booking-service';
 
 @Component({
   selector: 'app-manage-events',
@@ -13,8 +14,15 @@ import { EventStatus } from '../../../core/models/eventStatus';
 export class ManageEvents {
   private eventService = inject(EventService);
   authService = inject(AuthService);
+  private bookingService = inject(BookingService);
+
+  selectedBookingsEventId = signal<number | null>(null);
+  selectedEventBookings = signal<EventBooking[]>([]);
+  bookingsErrorMessage = signal('');
+  isLoadingBookings = signal(false);
 
   events = signal<Event[]>([]);
+
 
   drafts = computed(() =>
     this.events().filter(event => event.status === EventStatus.Draft)
@@ -106,6 +114,31 @@ export class ManageEvents {
       event.endDateTime &&
       new Date(event.startDateTime) < new Date(event.endDateTime)
     );
+  }
+  viewBookings(eventId: number): void {
+    if (this.selectedBookingsEventId() === eventId) {
+      this.selectedBookingsEventId.set(null);
+      this.selectedEventBookings.set([]);
+      this.bookingsErrorMessage.set('');
+      return;
+    }
+
+    this.selectedBookingsEventId.set(eventId);
+    this.selectedEventBookings.set([]);
+    this.bookingsErrorMessage.set('');
+    this.isLoadingBookings.set(true);
+
+    this.bookingService.getEventBookings(eventId).subscribe({
+      next: (bookings) => {
+        this.selectedEventBookings.set(bookings);
+        this.isLoadingBookings.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load event bookings', err);
+        this.bookingsErrorMessage.set('Failed to load bookings for this event.');
+        this.isLoadingBookings.set(false);
+      },
+    });
   }
 }
 
