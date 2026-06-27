@@ -11,7 +11,109 @@
 @if (errorMessage()) {
   <p class="error-message">{{ errorMessage() }}</p>
 }
+<section>
+  <h2>User Management</h2>
 
+  @if (isLoadingUsers()) {
+    <p>Loading users...</p>
+  }
+
+  @if (userManagementErrorMessage()) {
+    <p class="error-message">{{ userManagementErrorMessage() }}</p>
+  }
+
+  @if (!isLoadingUsers() && users().length === 0) {
+    <p>No users found.</p>
+  }
+
+  @if (users().length > 0) {
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Roles</th>
+        <th>Status</th>
+        <th>Details</th>
+        <th>Approval</th>
+      </tr>
+      </thead>
+
+      <tbody>
+        @for (user of users(); track user.id) {
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.roles.join(', ') }}</td>
+            <td>
+              @if (user.active) {
+                Approved
+              } @else {
+                Pending approval
+              }
+            </td>
+            <td>
+              <button
+                type="button"
+                (click)="toggleUserDetails(user.id)"
+              >
+                @if (selectedUserId() === user.id) {
+                  Hide Details
+                } @else {
+                  View Details
+                }
+              </button>
+            <td>
+              @if (user.roles.includes('admin')) {
+                <span>Admin protected</span>
+              } @else if (!user.active) {
+                <button
+                  type="button"
+                  (click)="approveUser(user.id)"
+                >
+                  Approve
+                </button>
+
+                <button
+                  type="button"
+                  (click)="rejectUser(user.id)"
+                >
+                  Reject
+                </button>
+              } @else {
+                <span>Already approved</span>
+              }
+            </td>
+          </tr>
+
+          @if (selectedUserId() === user.id) {
+            <tr>
+              <td colspan="7">
+                <strong>User Details</strong>
+
+                <p>ID: {{ user.id }}</p>
+                <p>Username: {{ user.username }}</p>
+                <p>Email: {{ user.email }}</p>
+                <p>Roles: {{ user.roles.join(', ') }}</p>
+                <p>Status: {{ user.active ? 'Active' : 'Inactive / Pending' }}</p>
+
+                @if (user.createdAt) {
+                  <p>Created at: {{ user.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                }
+
+                @if (user.updatedAt) {
+                  <p>Updated at: {{ user.updatedAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                }
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  }
+</section>
 @if (!isLoading() && events().length > 0) {
   <section>
     <h2>Event Export</h2>

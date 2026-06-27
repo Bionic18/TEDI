@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import {EventService} from '../../core/services/event-service';
 import {Event} from '../../core/models/events';
+import { UserService, AdminUser } from '../../core/services/user-service';
 
 @Component({
   selector: 'app-admin',
@@ -10,6 +11,12 @@ import {Event} from '../../core/models/events';
 })
 export class Admin {
   private eventService = inject(EventService);
+  private userService = inject(UserService);
+
+  users = signal<AdminUser[]>([]);
+  selectedUserId = signal<number | null>(null);
+  userManagementErrorMessage = signal('');
+  isLoadingUsers = signal(false);
 
   events = signal<Event[]>([]);
   isLoading = signal(false);
@@ -17,6 +24,7 @@ export class Admin {
 
   ngOnInit(): void {
     this.loadEvents();
+    this.loadUsers();
   }
 
   loadEvents(): void {
@@ -124,5 +132,54 @@ ${eventElements}
     link.click();
 
     URL.revokeObjectURL(url); //delete temporary url
+  }
+  private loadUsers(): void {
+    this.isLoadingUsers.set(true);
+    this.userManagementErrorMessage.set('');
+
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.users.set(users);
+        this.isLoadingUsers.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load users', err);
+        this.userManagementErrorMessage.set('Failed to load users.');
+        this.isLoadingUsers.set(false);
+      },
+    });
+  }
+
+  toggleUserDetails(userId: number): void {
+    this.selectedUserId.set(
+      this.selectedUserId() === userId ? null : userId
+    );
+  }
+
+  approveUser(userId: number): void {
+    this.userService.approveUser(userId).subscribe({
+      next: () => this.loadUsers(),
+      error: (err) => {
+        console.error('Failed to approve user', err);
+        this.userManagementErrorMessage.set('Failed to approve user.');
+      },
+    });
+  }
+
+  rejectUser(userId: number): void {
+    const confirmed = confirm(
+      'Are you sure you want to reject this pending user registration?'
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    this.userService.rejectUser(userId).subscribe({
+      next: () => this.loadUsers(),
+      error: () => {
+        this.userManagementErrorMessage.set('Failed to reject pending user.');
+        this.userManagementErrorMessage.set('Failed to reject user.');
+      },
+    });
   }
 }
