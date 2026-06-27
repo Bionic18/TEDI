@@ -1,5 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { EventService } from '../../../core/services/event-service';
+import { RecommendationService } from '../../../core/services/recommendation-service';
+import { AuthService } from '../../../core/services/auth-service';
 import { Event } from '../../../core/models/events';
 import { EventStatus } from '../../../core/models/eventStatus';
 
@@ -11,7 +13,10 @@ import { EventStatus } from '../../../core/models/eventStatus';
 })
 export class BrowseEvents {
   private eventService = inject(EventService);
-//we use signals so that the data is continuously updated
+  private recommendationService = inject(RecommendationService);
+  authService = inject(AuthService);
+
+  // We use signals so that the UI updates automatically when events or filters change.
   events = signal<Event[]>([]);
 
   searchTerm = signal('');
@@ -19,9 +24,12 @@ export class BrowseEvents {
   startDate = signal('');
   endDate = signal('');
 
-  currentPage = signal(1);
-  pageSize = 5; //5 events in each page
+  showRecommendedOnly = signal(false);
+  isLoading = signal(false);
+  errorMessage = signal('');
 
+  currentPage = signal(1);
+  pageSize = 5;
   filteredEvents = computed(() => {
     const search = this.searchTerm().trim().toLowerCase();
     const location = this.locationTerm().trim().toLowerCase();
@@ -75,20 +83,7 @@ export class BrowseEvents {
   });
 
   ngOnInit() {
-    this.eventService.getAllEvents().subscribe({
-      next: (events) => {
-        const publicEvents = events.filter(
-          event =>
-            event.status === EventStatus.Published ||
-            event.status === EventStatus.Cancelled
-        );
-
-        this.events.set(publicEvents);
-      },
-      error: (err) => {
-        console.error('Failed to load events', err);
-      },
-    });
+    this.loadEvents()
   }
 
   updateSearchTerm(value: string): void {
@@ -128,6 +123,88 @@ export class BrowseEvents {
   nextPage(): void {
     if (this.currentPage() < this.totalPages()) {
       this.currentPage.update(page => page + 1);
+    }
+  }
+  private loadEvents(): void {
+    if (this.showRecommendedOnly()) {
+      this.loadRecommendedEvents();
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.eventService.getAllEvents().subscribe({
+      next: (events) => {
+        const publicEvents = events.filter(
+          event =>
+            event.status === EventStatus.Published ||
+            event.status === EventStatus.Cancelled
+        );
+
+        this.events.set(publicEvents);
+        this.currentPage.set(1);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load events', err);
+        this.errorMessage.set('Failed to load events.');
+        this.isLoading.set(false);
+      },
+    });
+  }
+
+  private loadRecommendedEvents(): void {
+    const user = this.authService.currentUser();
+
+    if (!user) {
+      this.errorMessage.set('You must be logged in to view recommendations.');
+      this.events.set([]);
+      return;
+    }
+
+    const viewedEventIds = this.getViewedEventIds();
+
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.recommendationService.getRecommendations(viewedEventIds).subscribe({
+      next: (recommendedEvents) => {
+        this.events.set(recommendedEvents);
+        this.currentPage.set(1);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load recommendations', err);
+        this.errorMessage.set('Failed to load recommended events.');
+        this.isLoading.set(false);
+      },
+    });
+  }
+
+  toggleRecommendedOnly(checked: boolean): void {
+    this.showRecommendedOnly.set(checked);
+    this.currentPage.set(1);
+    this.loadEvents();
+  }
+
+  private getViewedEventIds(): number[] {
+    const user = this.authService.currentUser();
+
+    if (!user) {
+      return [];
+    }
+
+    const rawViewedEvents = localStorage.getItem(`viewedEvents-${user.id}`);
+
+    if (!rawViewedEvents) {
+      return [];
+    }
+
+    try {
+      return JSON.parse(rawViewedEvents) as number[];
+    } catch {
+      return [];
     }
   }
 }

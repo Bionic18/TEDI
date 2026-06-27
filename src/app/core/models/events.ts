@@ -23,6 +23,7 @@ export interface Event {
   bookings?: Booking[];
   createdAt?: Date | string;
   updatedAt?: Date | string;
+  recommendationScore?: number;
 }
 export interface TicketType {
   id: number;
