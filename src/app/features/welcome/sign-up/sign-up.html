@@ -1,1 +1,114 @@
-<p>sign-up works!</p>
+<h1>Sign Up</h1>
+
+<p>
+  Create an account. Your registration request must be approved by the
+  administrator before you can log in.
+</p>
+
+<form [formGroup]="signUpForm">
+  <h2>Account Information</h2>
+
+  <label>Username</label>
+  <input type="text" formControlName="username">
+  @if (hasError('username', 'required')) {
+    <p>Username is required.</p>
+  }
+
+  <label>Password</label>
+  <input type="password" formControlName="password">
+  @if (hasError('password', 'required')) {
+    <p>Password is required.</p>
+  }
+  @if (hasError('password', 'minlength')) {
+    <p>Password must be at least 6 characters long.</p>
+  }
+
+  <label>Confirm Password</label>
+  <input type="password" formControlName="confirmPassword">
+  @if (hasError('confirmPassword', 'required')) {
+    <p>Confirm password is required.</p>
+  }
+
+  <h2>Personal Information</h2>
+
+  <label>First Name</label>
+  <input type="text" formControlName="firstName">
+  @if (hasError('firstName', 'required')) {
+    <p>First name is required.</p>
+  }
+
+  <label>Last Name</label>
+  <input type="text" formControlName="lastName">
+  @if (hasError('lastName', 'required')) {
+    <p>Last name is required.</p>
+  }
+
+  <label>Email</label>
+  <input type="email" formControlName="email">
+  @if (hasError('email', 'required')) {
+    <p>Email is required.</p>
+  }
+  @if (hasError('email', 'email')) {
+    <p>Please enter a valid email address.</p>
+  }
+
+  <label>Phone</label>
+  <input type="text" formControlName="phone">
+  @if (hasError('phone', 'required')) {
+    <p>Phone is required.</p>
+  }
+
+  <h2>Address / Location</h2>
+
+  <label>Address</label>
+  <input type="text" formControlName="address">
+  @if (hasError('address', 'required')) {
+    <p>Address is required.</p>
+  }
+
+  <label>City</label>
+  <input type="text" formControlName="city">
+  @if (hasError('city', 'required')) {
+    <p>City is required.</p>
+  }
+
+  <label>Country</label>
+  <input type="text" formControlName="country">
+  @if (hasError('country', 'required')) {
+    <p>Country is required.</p>
+  }
+
+  <label>Latitude</label>
+  <input type="number" formControlName="latitude">
+
+  <label>Longitude</label>
+  <input type="number" formControlName="longitude">
+
+  <h2>Tax Information</h2>
+
+  <label>AFM</label>
+  <input type="text" formControlName="afm">
+  @if (hasError('afm', 'required')) {
+    <p>AFM is required.</p>
+  }
+
+  <button
+    type="button"
+    [disabled]="isSubmitting"
+    (click)="submit()"
+  >
+    @if (isSubmitting) {
+      Submitting...
+    } @else {
+      Submit Registration
+    }
+  </button>
+</form>
+
+@if (successMessage) {
+  <p>{{ successMessage }}</p>
+}
+
+@if (errorMessage) {
+  <p>{{ errorMessage }}</p>
+}

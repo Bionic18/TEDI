@@ -12,6 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { PublicUserDto } from './dto/public-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -80,6 +81,17 @@ export class UsersService {
       email: user.email,
       roles: user.roles,
       active: user.active,
+
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      address: user.address,
+      city: user.city,
+      country: user.country,
+      latitude: user.latitude,
+      longitude: user.longitude,
+      afm: user.afm,
+
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -152,5 +164,38 @@ export class UsersService {
     });
 
     return this.toPublicUser(user);
+  }
+  async register(createUserDto: CreateUserDto): Promise<PublicUserDto> {
+    if (createUserDto.password !== createUserDto.confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    const passwordHash = await bcrypt.hash(createUserDto.password, 10);
+
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          username: createUserDto.username,
+          email: createUserDto.email,
+          passwordHash,
+          roles: ['user'],
+          active: false,
+
+          firstName: createUserDto.firstName,
+          lastName: createUserDto.lastName,
+          phone: createUserDto.phone,
+          address: createUserDto.address,
+          city: createUserDto.city,
+          country: createUserDto.country,
+          latitude: createUserDto.latitude,
+          longitude: createUserDto.longitude,
+          afm: createUserDto.afm,
+        },
+      });
+
+      return this.toPublicUser(user);
+    } catch (error) {
+      this.handlePrismaError(error);
+    }
   }
 }

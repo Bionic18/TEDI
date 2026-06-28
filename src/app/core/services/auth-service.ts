@@ -19,7 +19,25 @@ interface JwtPayload {
   iat?: number;
   exp?: number;
 }
+export interface RegisterPayload {
+  username: string;
+  password: string;
+  confirmPassword: string;
 
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+
+  address: string;
+  city: string;
+  country: string;
+
+  latitude?: number | null;
+  longitude?: number | null;
+
+  afm: string;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -96,5 +114,8 @@ export class AuthService {
       localStorage.removeItem('access_token');
       return null;
     }
+  }
+  register(payload: RegisterPayload): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}/register`, payload);
   }
 }

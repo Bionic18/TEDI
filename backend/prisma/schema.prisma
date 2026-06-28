@@ -21,12 +21,22 @@ model User {
   passwordHash String
   roles        String[]
   active       Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  bookings Booking[]
 
-  // An organizer is just a registered user who has created events.
+  firstName    String?
+  lastName     String?
+  phone        String?
+  address      String?
+  city         String?
+  country      String?
+  latitude     Float?
+  longitude    Float?
+  afm          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   organizedEvents Event[] @relation("OrganizedEvents")
+  bookings        Booking[]
 }
 
 // EventStatus mirrors the Status values described in the assignment DTD.
