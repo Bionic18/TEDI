@@ -1,29 +1,21 @@
-import {EventStatus} from './eventStatus';
-
 export interface Event {
   id: number;
-
   name: string;
   description: string;
-
   venue: string;
   address: string;
   city: string;
   country: string;
-
-  startDateTime: Date | string;
-  endDateTime: Date | string;
-
+  startDateTime: string;
+  endDateTime: string;
   capacity: number;
-
-  status: EventStatus;
-
+  status: string;
   organizerId: number;
   ticketTypes?: TicketType[];
-  bookings?: Booking[];
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
-  recommendationScore?: number;
+
+  _count?: {
+    bookings: number;
+  };
 }
 export interface TicketType {
   id: number;

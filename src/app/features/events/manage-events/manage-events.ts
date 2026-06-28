@@ -140,5 +140,27 @@ export class ManageEvents {
       },
     });
   }
+  hasBookings(event: Event): boolean {
+    return (event._count?.bookings ?? 0) > 0;
+  }
+  deleteEvent(event: Event): void {
+    const message =
+      event.status === 'PUBLISHED'
+        ? 'This published event has no bookings. Are you sure you want to delete it permanently?'
+        : 'Are you sure you want to delete this draft event?';
+
+    const confirmed = confirm(message);
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.eventService.deleteEvent(event.id).subscribe({
+      next: () => this.loadEvents(),
+      error: (err) => {
+        console.error('Failed to delete event', err);
+      },
+    });
+  }
 }
 

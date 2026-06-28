@@ -14,11 +14,30 @@
       <a [routerLink]="['/events', event.id]">View Details</a>
       |
       <a [routerLink]="['/manage-events/edit', event.id]">Edit</a>
+      |
+      @if (event.status === 'DRAFT') {
+        <button type="button" (click)="deleteEvent(event)">
+          Delete Draft
+        </button>
+      }
       @if (event.status === 'PUBLISHED') {
+        @if (!hasBookings(event)) {
+          <button type="button" (click)="deleteEvent(event)">
+            Delete Event
+          </button>
+        }
+
+        @if (hasBookings(event)) {
+          <span>Cannot delete after first booking</span>
+        }
         |
         <button type="button" (click)="cancelEvent(event.id)">
           Cancel Event
         </button>
+      }
+
+      @if (event.status === 'CANCELLED') {
+        <span>Cancelled</span>
       }
       |
       <button

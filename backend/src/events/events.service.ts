@@ -29,6 +29,11 @@ export class EventsService {
       },
       include: {
         ticketTypes: true,
+        _count: {
+          select: {
+            bookings: true,
+          },
+        },
       },
       orderBy: { startDateTime: 'asc' },
     });
@@ -39,6 +44,11 @@ export class EventsService {
       include: {
         ticketTypes: true,
         bookings: true,
+        _count: {
+          select: {
+            bookings: true,
+          },
+        },
       },
     });
 
@@ -184,17 +194,21 @@ export class EventsService {
     const event = await this.findOne(id);
     this.assertOwnership(event.organizerId, userId);
 
-    // Assignment rule: deletion is only allowed before the event is published
-    // (and, once bookings exist, before the first booking). A published event
-    // must be cancelled instead (PUT status=CANCELLED), which keeps its data
-    // for historical / traceability reasons.
-    if (event.status !== EventStatus.DRAFT) {
+    const hasBookings = event.bookings.length > 0;
+
+    const canDelete =
+      event.status === EventStatus.DRAFT ||
+      (event.status === EventStatus.PUBLISHED && !hasBookings);
+
+    if (!canDelete) {
       throw new BadRequestException(
-        'Only unpublished (DRAFT) events can be deleted. Cancel the event instead.',
+        'Events can only be deleted before publication or before the first booking. Cancel the event instead.',
       );
     }
 
-    return this.prisma.event.delete({ where: { id } });
+    return this.prisma.event.delete({
+      where: { id },
+    });
   }
 
   private assertOwnership(organizerId: number, userId: number) {

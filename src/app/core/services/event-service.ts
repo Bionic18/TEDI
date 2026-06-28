@@ -60,7 +60,8 @@ export class EventService {
     return this.http.put<Event>(`${this.baseUrl}/${id}`, payload);
   }
 
-  // DELETE /events/{id}  (organizer only, DRAFT events only)
+// DELETE /events/{id}
+// Organizer only. Allowed before publication or before the first booking.
   deleteEvent(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
@@ -72,18 +73,3 @@ export class EventService {
     return this.http.patch<Event>(`${this.baseUrl}/${id}/cancel`, {});
   }
 }
-
-// TODO:
-// Replace with backend endpoints once available:
-// cancelEvent
-
-// cancelEvent(eventID: number): void {
-//
-//   const event = this.getEventByID(eventID);
-//
-//   if (event) {
-//     event.status = EventStatus.Cancelled;
-//   }
-//
-// }
-//
