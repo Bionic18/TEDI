@@ -28,7 +28,9 @@
   @if (hasError('confirmPassword', 'required')) {
     <p>Confirm password is required.</p>
   }
-
+  @if (passwordsDoNotMatch()) {
+    <p>Passwords do not match.</p>
+  }
   <h2>Personal Information</h2>
 
   <label>First Name</label>
@@ -91,7 +93,9 @@
   @if (hasError('afm', 'required')) {
     <p>AFM is required.</p>
   }
-
+  @if (hasError('afm', 'pattern')) {
+    <p>AFM must be exactly 9 digits.</p>
+  }
   <button
     type="button"
     [disabled]="isSubmitting"

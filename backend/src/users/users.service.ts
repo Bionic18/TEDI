@@ -167,7 +167,30 @@ export class UsersService {
   }
   async register(createUserDto: CreateUserDto): Promise<PublicUserDto> {
     if (createUserDto.password !== createUserDto.confirmPassword) {
-      throw new BadRequestException('Passwords do not match');
+      throw new BadRequestException('Passwords do not match.');
+    }
+
+    if (!/^\d{9}$/.test(createUserDto.afm)) {
+      throw new BadRequestException('AFM must be exactly 9 digits.');
+    }
+
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: createUserDto.username },
+          { email: createUserDto.email },
+        ],
+      },
+    });
+
+    if (existingUser) {
+      if (existingUser.username === createUserDto.username) {
+        throw new ConflictException('Username is already taken.');
+      }
+
+      if (existingUser.email === createUserDto.email) {
+        throw new ConflictException('Email is already registered.');
+      }
     }
 
     const passwordHash = await bcrypt.hash(createUserDto.password, 10);

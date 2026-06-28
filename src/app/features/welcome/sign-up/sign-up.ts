@@ -1,6 +1,21 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators,  AbstractControl, ValidationErrors, ValidatorFn,} from '@angular/forms';
 import { AuthService } from '../../../core/services/auth-service';
+
+
+const passwordMatchValidator: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null => {
+  const password = control.get('password')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+
+  if (!password || !confirmPassword) {
+    return null;
+  }
+
+  return password === confirmPassword ? null : { passwordsMismatch: true };
+};
+
 
 @Component({
   selector: 'app-sign-up',
@@ -8,6 +23,8 @@ import { AuthService } from '../../../core/services/auth-service';
   templateUrl: './sign-up.html',
   styleUrl: './sign-up.css',
 })
+
+
 export class SignUp {
   private authService = inject(AuthService);
 
@@ -15,28 +32,34 @@ export class SignUp {
   successMessage = '';
   errorMessage = '';
 
-  signUpForm = new FormGroup({
-    username: new FormControl('', Validators.required),
-    password: new FormControl('', [
-      Validators.required,
-      Validators.minLength(6),
-    ]),
-    confirmPassword: new FormControl('', Validators.required),
+  signUpForm = new FormGroup(
+    {
+      username: new FormControl('', Validators.required),
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(6),
+      ]),
+      confirmPassword: new FormControl('', Validators.required),
 
-    firstName: new FormControl('', Validators.required),
-    lastName: new FormControl('', Validators.required),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    phone: new FormControl('', Validators.required),
+      firstName: new FormControl('', Validators.required),
+      lastName: new FormControl('', Validators.required),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      phone: new FormControl('', Validators.required),
 
-    address: new FormControl('', Validators.required),
-    city: new FormControl('', Validators.required),
-    country: new FormControl('', Validators.required),
+      address: new FormControl('', Validators.required),
+      city: new FormControl('', Validators.required),
+      country: new FormControl('', Validators.required),
 
-    latitude: new FormControl<number | null>(null),
-    longitude: new FormControl<number | null>(null),
+      latitude: new FormControl<number | null>(null),
+      longitude: new FormControl<number | null>(null),
 
-    afm: new FormControl('', Validators.required),
-  });
+      afm: new FormControl('', [
+        Validators.required,
+        Validators.pattern(/^\d{9}$/),
+      ]),
+    },
+    { validators: passwordMatchValidator },
+  );
 
   submit(): void {
     this.successMessage = '';
@@ -94,5 +117,11 @@ export class SignUp {
   hasError(controlName: string, errorName: string): boolean {
     const control = this.signUpForm.get(controlName);
     return !!(control?.errors?.[errorName] && control.touched);
+  }
+  passwordsDoNotMatch(): boolean {
+    return !!(
+      this.signUpForm.errors?.['passwordsMismatch'] &&
+      this.signUpForm.get('confirmPassword')?.touched
+    );
   }
 }
